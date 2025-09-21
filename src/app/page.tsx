@@ -5,21 +5,23 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 import { 
-  Heart, 
-  Star, 
-  Zap, 
-  Sparkles, 
-  Rocket, 
-  Code, 
-  Palette, 
-  MousePointer 
+  Clock, 
+  DollarSign, 
+  BarChart3, 
+  Calendar, 
+  Timer, 
+  TrendingUp,
+  CheckCircle,
+  Users,
+  Smartphone,
+  Shield,
+  Zap,
+  ArrowRight
 } from "lucide-react";
 
 export default function Home() {
-  const [liked, setLiked] = useState(false);
-  const [stars, setStars] = useState(42);
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -39,204 +41,217 @@ export default function Home() {
     }
   };
 
+  const features = [
+    {
+      icon: Clock,
+      title: "Time Tracking",
+      description: "Record your working hours simply and accurately",
+      color: "text-blue-500"
+    },
+    {
+      icon: DollarSign,
+      title: "Automatic Calculation",
+      description: "Automatically calculate your earnings based on your hourly rate",
+      color: "text-green-500"
+    },
+    {
+      icon: BarChart3,
+      title: "Detailed Reports",
+      description: "View comprehensive reports of your time and earnings",
+      color: "text-purple-500"
+    },
+    {
+      icon: Calendar,
+      title: "Date Organization",
+      description: "Organize and filter your records by period",
+      color: "text-orange-500"
+    }
+  ];
+
+  const steps = [
+    {
+      number: "1",
+      title: "Sign Up",
+      description: "Create your account and set up your hourly rate",
+      icon: Users
+    },
+    {
+      number: "2",
+      title: "Log Hours",
+      description: "Add your working hours with project and description",
+      icon: Timer
+    },
+    {
+      number: "3",
+      title: "Track Earnings",
+      description: "View your earnings and reports in real time",
+      icon: TrendingUp
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <motion.div
-        className="max-w-6xl mx-auto"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* Header */}
-        <motion.div variants={itemVariants} className="text-center mb-12">
-          <motion.h1 
-            className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4"
+        {/* Hero Section */}
+        <motion.div variants={itemVariants} className="text-center py-20">
+          <motion.div
+            className="inline-flex items-center gap-2 mb-6"
             whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300 }}
           >
-            <Sparkles className="inline-block mr-2 text-yellow-500" />
-            Integrated UI Libraries
-          </motion.h1>
+            <Clock className="w-12 h-12 text-blue-600" />
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              WorkLog
+            </h1>
+          </motion.div>
+          
           <motion.p 
-            className="text-xl text-slate-600 dark:text-slate-300"
+            className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
             variants={itemVariants}
           >
-            Demonstration of Shadcn/UI + Radix + Lucide + Framer Motion
+            Track your working hours and calculate your earnings simply and efficiently. 
+            Perfect for freelancers and independent professionals.
           </motion.p>
-        </motion.div>
 
-        {/* Badges */}
-        <motion.div variants={itemVariants} className="flex justify-center gap-2 mb-8 flex-wrap">
-          <Badge variant="default" className="text-sm">
-            <Code className="w-4 h-4 mr-1" />
-            Shadcn/UI
-          </Badge>
-          <Badge variant="secondary" className="text-sm">
-            <Palette className="w-4 h-4 mr-1" />
-            Radix UI
-          </Badge>
-          <Badge variant="outline" className="text-sm">
-            <Sparkles className="w-4 h-4 mr-1" />
-            Lucide Icons
-          </Badge>
-          <Badge variant="destructive" className="text-sm">
-            <Zap className="w-4 h-4 mr-1" />
-            Framer Motion
-          </Badge>
-        </motion.div>
-
-        {/* Cards Grid */}
-        <motion.div 
-          variants={itemVariants}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
-        >
-          {/* Card 1 - Shadcn/UI */}
-          <motion.div
-            whileHover={{ scale: 1.05, rotateY: 5 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300 }}
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            variants={itemVariants}
           >
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Code className="w-5 h-5 text-blue-500" />
-                  Shadcn/UI
-                </CardTitle>
-                <CardDescription>
-                  Componentes reutilizáveis construídos com Radix UI e Tailwind CSS
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <Button className="w-full">
-                    <Rocket className="w-4 h-4 mr-2" />
-                    Botão Principal
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    Botão Secundário
-                  </Button>
-                  <Button variant="ghost" size="sm" className="w-full">
-                    Botão Ghost
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <Link href="/register">
+              <Button size="lg" className="w-full sm:w-auto">
+                <Users className="w-5 h-5 mr-2" />
+                Create Free Account
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                <Shield className="w-5 h-5 mr-2" />
+                Sign In
+              </Button>
+            </Link>
           </motion.div>
 
-          {/* Card 2 - Lucide Icons */}
-          <motion.div
-            whileHover={{ scale: 1.05, rotateY: -5 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300 }}
+          <motion.div 
+            className="flex justify-center gap-2 mt-6 flex-wrap"
+            variants={itemVariants}
           >
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="w-5 h-5 text-green-500" />
-                  Lucide Icons
-                </CardTitle>
-                <CardDescription>
-                  Ícones bonitos e consistentes para sua aplicação
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-4 gap-4">
-                  {[Heart, Star, Zap, Sparkles, Rocket, Code, Palette, MousePointer].map((Icon, index) => (
-                    <motion.div
-                      key={index}
-                      className="flex justify-center p-3 rounded-lg bg-slate-100 dark:bg-slate-800"
-                      whileHover={{ scale: 1.2, rotate: 360 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Icon className="w-6 h-6 text-slate-600 dark:text-slate-300" />
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Card 3 - Framer Motion */}
-          <motion.div
-            whileHover={{ scale: 1.05, rotateX: 5 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-purple-500" />
-                  Framer Motion
-                </CardTitle>
-                <CardDescription>
-                  Animações fluidas e interações envolventes
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <motion.div
-                  className="w-full h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
-                  animate={{
-                    scale: [1, 1.05, 1],
-                    rotate: [0, 1, -1, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "reverse"
-                  }}
-                />
-                <div className="flex gap-2">
-                  <motion.button
-                    className="flex-1 p-2 bg-blue-500 text-white rounded-lg"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      setLiked(!liked);
-                      if (!liked) setStars(stars + 1);
-                      else setStars(stars - 1);
-                    }}
-                  >
-                    <Heart className={`w-4 h-4 mx-auto ${liked ? 'fill-current' : ''}`} />
-                  </motion.button>
-                  <motion.div
-                    className="flex items-center gap-1 px-3 py-2 bg-yellow-500 text-white rounded-lg"
-                    animate={{ scale: liked ? [1, 1.2, 1] : 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Star className="w-4 h-4" />
-                    <span className="text-sm font-medium">{stars}</span>
-                  </motion.div>
-                </div>
-              </CardContent>
-            </Card>
+            <Badge variant="secondary" className="text-sm">
+              <CheckCircle className="w-4 h-4 mr-1" />
+              Free
+            </Badge>
+            <Badge variant="secondary" className="text-sm">
+              <Smartphone className="w-4 h-4 mr-1" />
+              Responsive
+            </Badge>
+            <Badge variant="secondary" className="text-sm">
+              <Zap className="w-4 h-4 mr-1" />
+              Fast
+            </Badge>
           </motion.div>
         </motion.div>
 
-        {/* Footer */}
-        <motion.div variants={itemVariants} className="text-center">
-          <motion.p 
-            className="text-slate-600 dark:text-slate-400 mb-4"
+        {/* Features Section */}
+        <motion.div variants={itemVariants} className="py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Key Features
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Everything you need to manage your time and calculate your earnings
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.05, y: -5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <Card className="h-full text-center border-0 shadow-lg">
+                  <CardHeader>
+                    <div className="mx-auto mb-4">
+                      <feature.icon className={`w-12 h-12 ${feature.color}`} />
+                    </div>
+                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-base">
+                      {feature.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* How it Works Section */}
+        <motion.div variants={itemVariants} className="py-16 bg-gray-50 rounded-3xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              How It Works
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              In just 3 simple steps you'll be tracking your hours
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto px-6">
+            {steps.map((step, index) => (
+              <motion.div
+                key={index}
+                className="text-center"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                    {step.number}
+                  </div>
+                  <step.icon className="w-8 h-8 text-blue-600 mx-auto" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-gray-600">
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* CTA Section */}
+        <motion.div variants={itemVariants} className="py-20 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Ready to get started?
+          </h2>
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            Join thousands of professionals who already track their hours with WorkLog
+          </p>
+          
+          <motion.div
             whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            All libraries working perfectly together! 🚀
-          </motion.p>
-          <motion.div
-            className="flex justify-center gap-4"
-            variants={containerVariants}
-          >
-            <motion.div variants={itemVariants}>
-              <Button variant="outline" size="lg">
-                <Code className="w-4 h-4 mr-2" />
-                View Code
+            <Link href="/register">
+              <Button size="lg" className="text-lg px-8 py-4">
+                <Users className="w-5 h-5 mr-2" />
+                Get Started Now - It's Free!
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <Button size="lg">
-                <Rocket className="w-4 h-4 mr-2" />
-                Start Project
-              </Button>
-            </motion.div>
+            </Link>
           </motion.div>
+
+          <p className="text-sm text-gray-500 mt-4">
+            No credit card required
+          </p>
         </motion.div>
       </motion.div>
     </div>

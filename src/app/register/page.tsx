@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, User, Phone, UserPlus, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import PhoneInput from "@/components/ui/phone-input";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+
+  // Redirect to dashboard if user is already logged in
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, authLoading, router]);
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",

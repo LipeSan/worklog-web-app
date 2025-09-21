@@ -4,12 +4,7 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Redirecionar página inicial para dashboard
-  if (pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
-  // Para todas as outras rotas, permitir acesso
+  // Para todas as rotas, permitir acesso
   // A proteção de autenticação será feita no lado do cliente
   return NextResponse.next();
 }
