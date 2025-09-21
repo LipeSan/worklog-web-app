@@ -55,7 +55,7 @@ export default function Header({ title, subtitle, onMenuClick, children }: Heade
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
 
-  // Fechar dropdown ao clicar fora
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -78,14 +78,14 @@ export default function Header({ title, subtitle, onMenuClick, children }: Heade
       });
 
       if (response.ok) {
-        // Usar o logout do contexto
-        logout();
+        // Use context logout
+        await logout();
       } else {
-        console.error('Erro no logout');
+        console.error('Logout error');
         setIsLoggingOut(false);
       }
     } catch (error) {
-      console.error('Erro no logout:', error);
+      console.error('Logout error:', error);
       setIsLoggingOut(false);
     }
   };
@@ -129,13 +129,13 @@ export default function Header({ title, subtitle, onMenuClick, children }: Heade
               className="flex items-center space-x-2 sm:space-x-3 hover:bg-gray-50 rounded-lg p-2 transition-colors"
             >
               <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
-                <AvatarImage src="/kangaroo-avatar.svg" alt="Avatar do usuário" />
+                <AvatarImage src="/kangaroo-avatar.svg" alt="User avatar" />
                 <AvatarFallback className="text-xs sm:text-sm">
                   {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden md:block">
-                <p className="text-sm font-medium text-gray-900">{user?.name || 'Usuário'}</p>
+                <p className="text-sm font-medium text-gray-900">{user?.name || 'User'}</p>
                 <p className="text-xs text-gray-500">{user?.email || ''}</p>
               </div>
             </button>
@@ -151,7 +151,7 @@ export default function Header({ title, subtitle, onMenuClick, children }: Heade
                   className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   <User className="w-4 h-4 mr-3" />
-                  Perfil
+                  Profile
                 </button>
                 <hr className="my-1" />
                 <button
@@ -167,7 +167,7 @@ export default function Header({ title, subtitle, onMenuClick, children }: Heade
                   ) : (
                     <LogOut className="w-4 h-4 mr-3" />
                   )}
-                  {isLoggingOut ? 'Saindo...' : 'Sair'}
+                  {isLoggingOut ? 'Signing out...' : 'Sign out'}
                 </button>
               </div>
             )}

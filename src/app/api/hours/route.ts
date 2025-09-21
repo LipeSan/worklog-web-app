@@ -1,54 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { query } from '@/lib/database';
+import { HoursData } from '@/types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
-interface HoursData {
-  date: string;
-  project: string;
-  startTime: string;
-  endTime: string;
-  hours: number;
-  description?: string;
-}
 
 // Função para validar os dados de entrada
 function validateHoursData(data: HoursData): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   if (!data.date) {
-    errors.push('Data é obrigatória');
+    errors.push('Date is required');
   } else {
     const date = new Date(data.date);
     if (isNaN(date.getTime())) {
-      errors.push('Data inválida');
+      errors.push('Invalid date');
     }
   }
 
   if (!data.project || typeof data.project !== 'string' || data.project.trim().length === 0) {
-    errors.push('Nome do projeto é obrigatório');
+    errors.push('Project name is required');
   }
 
   if (!data.startTime || typeof data.startTime !== 'string') {
-    errors.push('Horário de início é obrigatório');
+    errors.push('Start time is required');
   }
 
   if (!data.endTime || typeof data.endTime !== 'string') {
-    errors.push('Horário de fim é obrigatório');
+    errors.push('End time is required');
   }
 
   if (typeof data.hours !== 'number' || data.hours <= 0) {
-    errors.push('Número de horas deve ser maior que zero');
+    errors.push('Number of hours must be greater than zero');
   }
 
-  // Validar se o horário de fim é maior que o de início
+  // Validate if end time is greater than start time
   if (data.startTime && data.endTime) {
     const start = new Date(`2000-01-01T${data.startTime}:00`);
     const end = new Date(`2000-01-01T${data.endTime}:00`);
     
     if (end <= start) {
-      errors.push('Horário de fim deve ser maior que o horário de início');
+      errors.push('End time must be greater than start time');
     }
   }
 
@@ -66,50 +58,50 @@ function calculateHours(startTime: string, endTime: string): number {
   const diffMs = end.getTime() - start.getTime();
   const diffHours = diffMs / (1000 * 60 * 60);
   
-  return Math.round(diffHours * 100) / 100; // Arredonda para 2 casas decimais
+  return Math.round(diffHours * 100) / 100; // Round to 2 decimal places
 }
 
 export async function POST(request: NextRequest) {
   try {
-    // Verificar autenticação
+    // Check authentication
     const authHeader = request.headers.get('authorization');
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Token de acesso não fornecido' },
+        { error: 'Access token not provided' },
         { status: 401 }
       );
     }
 
     const token = authHeader.substring(7);
 
-    // Verificar e decodificar o token
+    // Verify and decode token
     let decoded: { userId: number };
     try {
       decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
     } catch (error) {
       return NextResponse.json(
-        { error: 'Token inválido' },
+        { error: 'Invalid token' },
         { status: 401 }
       );
     }
 
-    // Obter dados do corpo da requisição
+    // Get request body data
     const body = await request.json();
     
-    // Validar dados
+    // Validate data
     const validation = validateHoursData(body);
     if (!validation.isValid) {
       return NextResponse.json(
-        { error: 'Dados inválidos', details: validation.errors },
+        { error: 'Invalid data', details: validation.errors },
         { status: 400 }
       );
     }
 
-    // Sempre calcular horas automaticamente baseado nos horários
+    // Always calculate hours automatically based on times
     const calculatedHours = calculateHours(body.startTime, body.endTime);
     
-    // Buscar a taxa horária do usuário
+    // Get user hourly rate
     const userResult = await query(
       'SELECT rate FROM users WHERE id = $1',
       [decoded.userId]
@@ -117,14 +109,14 @@ export async function POST(request: NextRequest) {
 
     if (userResult.rows.length === 0) {
       return NextResponse.json(
-        { error: 'Usuário não encontrado' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
 
     const userRate = parseFloat(userResult.rows[0].rate);
 
-    // Inserir registro de horas no banco
+    // Insert hours record in database
     const insertResult = await query(
       `INSERT INTO work_hours 
        (user_id, project_name, work_date, start_time, end_time, total_hours, hourly_rate, description)
@@ -145,7 +137,7 @@ export async function POST(request: NextRequest) {
     const newRecord = insertResult.rows[0];
 
     return NextResponse.json({
-      message: 'Horas registradas com sucesso',
+      message: 'Hours registered successfully',
       data: {
         id: newRecord.id,
         userId: newRecord.user_id,
@@ -162,23 +154,23 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erro ao registrar horas:', error);
+    console.error('Error registering hours:', error);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
 
-// API para listar horas do usuário
+// API to list user hours
 export async function GET(request: NextRequest) {
   try {
     // Verificar autenticação
     const authHeader = request.headers.get('authorization');
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader || !authHeader.startsWith('Bearer '))if (!token) {
       return NextResponse.json(
-        { error: 'Token de acesso não fornecido' },
+        { error: 'Access token not provided' },
         { status: 401 }
       );
     }
@@ -276,9 +268,9 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erro ao buscar horas:', error);
+    console.error('Error fetching hours:', error);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

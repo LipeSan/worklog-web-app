@@ -23,19 +23,19 @@ interface ResetTokenPayload {
 // Função para validar força da senha
 function validatePasswordStrength(password: string): { isValid: boolean; message?: string } {
   if (password.length < 8) {
-    return { isValid: false, message: 'A senha deve ter pelo menos 8 caracteres' };
+    return { isValid: false, message: 'Password must be at least 8 characters' };
   }
   
   if (!/(?=.*[a-z])/.test(password)) {
-    return { isValid: false, message: 'A senha deve conter pelo menos uma letra minúscula' };
+    return { isValid: false, message: 'Password must contain at least one lowercase letter' };
   }
   
   if (!/(?=.*[A-Z])/.test(password)) {
-    return { isValid: false, message: 'A senha deve conter pelo menos uma letra maiúscula' };
+    return { isValid: false, message: 'Password must contain at least one uppercase letter' };
   }
   
   if (!/(?=.*\d)/.test(password)) {
-    return { isValid: false, message: 'A senha deve conter pelo menos um número' };
+    return { isValid: false, message: 'Password must contain at least one number' };
   }
   
   return { isValid: true };
@@ -52,7 +52,7 @@ async function verifyResetToken(token: string): Promise<{ isValid: boolean; payl
     
     // Verificar se é um token de reset
     if (payload.type !== 'password_reset') {
-      return { isValid: false, message: 'Token inválido' };
+      return { isValid: false, message: 'Invalid token' };
     }
     
     // Verificar se o token existe no banco e não foi usado
@@ -65,26 +65,26 @@ async function verifyResetToken(token: string): Promise<{ isValid: boolean; payl
     const result = await query(queryText, [token]);
     
     if (result.rows.length === 0) {
-      return { isValid: false, message: 'Token inválido ou já utilizado' };
+      return { isValid: false, message: 'Invalid or already used token' };
     }
     
     const tokenData = result.rows[0];
     
     // Verificar se o token expirou
     if (new Date() > new Date(tokenData.expires_at)) {
-      return { isValid: false, message: 'Token expirado' };
+      return { isValid: false, message: 'Expired token' };
     }
     
     // Verificar se o user_id do token corresponde ao payload
     if (tokenData.user_id !== payload.userId) {
-      return { isValid: false, message: 'Token inválido' };
+      return { isValid: false, message: 'Invalid token' };
     }
     
     return { isValid: true, payload };
     
   } catch (error) {
-    console.error('Erro ao verificar token:', error);
-    return { isValid: false, message: 'Token inválido' };
+    console.error('Error verifying token:', error);
+    return { isValid: false, message: 'Invalid token' };
   }
 }
 
@@ -122,8 +122,8 @@ export async function POST(request: NextRequest) {
     if (!token || !newPassword || !confirmPassword) {
       return NextResponse.json(
         { 
-          error: 'Todos os campos são obrigatórios',
-          details: 'Token, nova senha e confirmação são necessários'
+          error: 'All fields are required',
+          details: 'Token, new password and confirmation are required'
         },
         { status: 400 }
       );
@@ -132,9 +132,9 @@ export async function POST(request: NextRequest) {
     // Verificar se as senhas coincidem
     if (newPassword !== confirmPassword) {
       return NextResponse.json(
-        { 
-          error: 'Senhas não coincidem',
-          details: 'A nova senha e a confirmação devem ser iguais'
+        {
+          error: 'Passwords do not match',
+          details: 'The new password and confirmation must be the same'
         },
         { status: 400 }
       );
@@ -144,8 +144,8 @@ export async function POST(request: NextRequest) {
     const passwordValidation = validatePasswordStrength(newPassword);
     if (!passwordValidation.isValid) {
       return NextResponse.json(
-        { 
-          error: 'Senha não atende aos critérios de segurança',
+        {
+          error: 'Password does not meet security criteria',
           details: passwordValidation.message
         },
         { status: 400 }
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
     if (!tokenVerification.isValid) {
       return NextResponse.json(
         { 
-          error: 'Token inválido',
+          error: 'Invalid token',
           details: tokenVerification.message
         },
         { status: 400 }
@@ -171,8 +171,8 @@ export async function POST(request: NextRequest) {
     if (!user || !user.is_active) {
       return NextResponse.json(
         { 
-          error: 'Usuário não encontrado',
-          details: 'Usuário não existe ou está inativo'
+          error: 'User not found',
+          details: 'User does not exist or is inactive'
         },
         { status: 404 }
       );
@@ -187,18 +187,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         success: true,
-        message: 'Senha redefinida com sucesso'
+        message: 'Password reset successfully'
       },
       { status: 200 }
     );
 
   } catch (error) {
-    console.error('Erro ao redefinir senha:', error);
+    console.error('Error resetting password:', error);
     
     return NextResponse.json(
       { 
-        error: 'Erro interno do servidor',
-        details: 'Tente novamente mais tarde'
+        error: 'Internal server error',
+        details: 'Please try again later'
       },
       { status: 500 }
     );
@@ -214,8 +214,8 @@ export async function GET(request: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { 
-          error: 'Token não fornecido',
-          details: 'Parâmetro token é obrigatório'
+          error: 'Token not provided',
+          details: 'Token parameter is required'
         },
         { status: 400 }
       );
@@ -237,18 +237,18 @@ export async function GET(request: NextRequest) {
       { 
         valid: true,
         email: tokenVerification.payload!.email,
-        message: 'Token válido'
+        message: 'Valid token'
       },
       { status: 200 }
     );
 
   } catch (error) {
-    console.error('Erro ao verificar token:', error);
+    console.error('Error verifying token:', error);
     
     return NextResponse.json(
       { 
         valid: false,
-        message: 'Erro ao verificar token'
+        message: 'Error verifying token'
       },
       { status: 500 }
     );

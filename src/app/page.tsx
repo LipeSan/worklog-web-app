@@ -55,13 +55,13 @@ export default function Home() {
             transition={{ type: "spring", stiffness: 300 }}
           >
             <Sparkles className="inline-block mr-2 text-yellow-500" />
-            Bibliotecas UI Integradas
+            Integrated UI Libraries
           </motion.h1>
           <motion.p 
             className="text-xl text-slate-600 dark:text-slate-300"
             variants={itemVariants}
           >
-            Demonstração do Shadcn/UI + Radix + Lucide + Framer Motion
+            Demonstration of Shadcn/UI + Radix + Lucide + Framer Motion
           </motion.p>
         </motion.div>
 
@@ -218,7 +218,7 @@ export default function Home() {
             className="text-slate-600 dark:text-slate-400 mb-4"
             whileHover={{ scale: 1.05 }}
           >
-            Todas as bibliotecas funcionando perfeitamente juntas! 🚀
+            All libraries working perfectly together! 🚀
           </motion.p>
           <motion.div
             className="flex justify-center gap-4"
@@ -227,13 +227,13 @@ export default function Home() {
             <motion.div variants={itemVariants}>
               <Button variant="outline" size="lg">
                 <Code className="w-4 h-4 mr-2" />
-                Ver Código
+                View Code
               </Button>
             </motion.div>
             <motion.div variants={itemVariants}>
               <Button size="lg">
                 <Rocket className="w-4 h-4 mr-2" />
-                Começar Projeto
+                Start Project
               </Button>
             </motion.div>
           </motion.div>

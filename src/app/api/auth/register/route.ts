@@ -68,17 +68,17 @@ export async function POST(request: NextRequest) {
     if (!fullName || !phone || !email || !password) {
       return NextResponse.json(
         { 
-          error: 'Todos os campos são obrigatórios',
-          details: 'fullName, phone, email e password são necessários'
+          error: 'Incomplete data',
+          details: 'fullName, phone, email and password are required'
         },
         { status: 400 }
       );
     }
 
     // Validação do nome completo
-    if (fullName.trim().length < 2) {
+    if (!fullName || fullName.trim().length < 2) {
       return NextResponse.json(
-        { error: 'Nome completo deve ter pelo menos 2 caracteres' },
+        { error: 'Full name must be at least 2 characters' },
         { status: 400 }
       );
     }
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     // Validação do email
     if (!isValidEmail(email)) {
       return NextResponse.json(
-        { error: 'Email inválido' },
+        { error: 'Invalid email' },
         { status: 400 }
       );
     }
@@ -94,9 +94,9 @@ export async function POST(request: NextRequest) {
     // Validação do telefone
     if (!isValidAustralianPhone(phone)) {
       return NextResponse.json(
-        { 
-          error: 'Telefone inválido',
-          details: 'Use o formato +61XXXXXXXXX para telefones australianos'
+        {
+          error: 'Invalid phone number',
+          details: 'Use the format +61XXXXXXXXX for Australian phones'
         },
         { status: 400 }
       );
@@ -105,9 +105,9 @@ export async function POST(request: NextRequest) {
     // Validação da senha
     if (!isValidPassword(password)) {
       return NextResponse.json(
-        { 
-          error: 'Senha inválida',
-          details: 'A senha deve ter pelo menos 8 caracteres, incluindo letras e números'
+        {
+          error: 'Invalid password',
+          details: 'Password must be at least 8 characters, including letters and numbers'
         },
         { status: 400 }
       );
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
     const emailExists = await UserModel.emailExists(email.toLowerCase().trim());
     if (emailExists) {
       return NextResponse.json(
-        { error: 'Email já cadastrado' },
+        { error: 'Email already registered' },
         { status: 409 }
       );
     }
@@ -145,26 +145,24 @@ export async function POST(request: NextRequest) {
     // Resposta de sucesso
     return NextResponse.json(
       {
-        message: 'Usuário registrado com sucesso',
+        message: 'User created successfully',
         user: {
           id: savedUser.id,
-          fullName: savedUser.full_name,
+          name: savedUser.full_name,
           email: savedUser.email,
-          phone: savedUser.phone,
-          rate: savedUser.rate,
-          createdAt: savedUser.created_at
+          phone: savedUser.phone
         }
       },
       { status: 201 }
     );
 
   } catch (error) {
-    console.error('Erro no registro:', error);
+    console.error('Registration error:', error);
     
     return NextResponse.json(
       { 
-        error: 'Erro interno do servidor',
-        details: 'Tente novamente mais tarde'
+        error: 'Internal server error',
+        details: 'Error creating user'
       },
       { status: 500 }
     );
@@ -175,7 +173,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json(
     { 
-      message: 'API de registro funcionando',
+      message: 'Registration API working',
       endpoint: '/api/auth/register',
       methods: ['POST']
     },

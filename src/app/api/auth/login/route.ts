@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken';
 interface LoginData {
   email: string;
   password: string;
+  remember?: boolean;
 }
 
 // Função para validar email
@@ -16,14 +17,18 @@ function isValidEmail(email: string): boolean {
 }
 
 // Função para gerar JWT token
-function generateToken(userId: number, email: string): string {
+function generateToken(userId: number, email: string, remember: boolean = false): string {
   const secret = process.env.JWT_SECRET || 'your-secret-key';
+  const expirationTime = remember 
+    ? (30 * 24 * 60 * 60) // 30 dias se lembrar
+    : (24 * 60 * 60); // 24 horas se não lembrar
+  
   return jwt.sign(
     { 
       userId, 
       email,
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 horas
+      exp: Math.floor(Date.now() / 1000) + expirationTime
     },
     secret
   );
@@ -32,14 +37,14 @@ function generateToken(userId: number, email: string): string {
 export async function POST(request: NextRequest) {
   try {
     const body: LoginData = await request.json();
-    const { email, password } = body;
+    const { email, password, remember = false } = body;
 
     // Validação dos campos obrigatórios
     if (!email || !password) {
       return NextResponse.json(
-        { 
-          error: 'Email e senha são obrigatórios',
-          details: 'Preencha todos os campos'
+        {
+          error: 'Email and password are required',
+          details: 'Both fields must be filled'
         },
         { status: 400 }
       );
@@ -48,7 +53,7 @@ export async function POST(request: NextRequest) {
     // Validação do email
     if (!isValidEmail(email)) {
       return NextResponse.json(
-        { error: 'Email inválido' },
+        { error: 'Invalid email' },
         { status: 400 }
       );
     }
@@ -66,7 +71,7 @@ export async function POST(request: NextRequest) {
     const user = await UserModel.findByEmail(email.toLowerCase().trim());
     if (!user) {
       return NextResponse.json(
-        { error: 'Credenciais inválidas' },
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
@@ -75,18 +80,18 @@ export async function POST(request: NextRequest) {
     const isPasswordValid = await UserModel.verifyPassword(password, user.password_hash);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: 'Credenciais inválidas' },
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
     // Gerar token JWT
-    const token = generateToken(user.id, user.email);
+    const token = generateToken(user.id, user.email, remember);
 
     // Resposta de sucesso
     const response = NextResponse.json(
       {
-        message: 'Login realizado com sucesso',
+        message: 'Login successful',
         token: token,
         user: {
           id: user.id,
@@ -101,23 +106,27 @@ export async function POST(request: NextRequest) {
     );
 
     // Definir cookie com o token (httpOnly para segurança)
+    const cookieMaxAge = remember 
+      ? 30 * 24 * 60 * 60 * 1000 // 30 dias se lembrar
+      : 24 * 60 * 60 * 1000; // 24 horas se não lembrar
+    
     response.cookies.set('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000, // 24 horas
+      maxAge: cookieMaxAge,
       path: '/'
     });
 
     return response;
 
   } catch (error) {
-    console.error('Erro no login:', error);
+    console.error('Login error:', error);
     
     return NextResponse.json(
       { 
-        error: 'Erro interno do servidor',
-        details: 'Tente novamente mais tarde'
+        error: 'Internal server error',
+        details: 'Error processing login'
       },
       { status: 500 }
     );
@@ -128,7 +137,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json(
     { 
-      message: 'API de login funcionando',
+      message: 'Login API working',
       endpoint: '/api/auth/login',
       methods: ['POST']
     },

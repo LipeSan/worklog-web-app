@@ -14,7 +14,7 @@ export async function PUT(request: NextRequest) {
     // Validações
     if (!userId || typeof userId !== 'number') {
       return NextResponse.json(
-        { error: 'ID do usuário é obrigatório' },
+        { error: 'User ID is required' },
         { status: 400 }
       );
     }
@@ -31,7 +31,7 @@ export async function PUT(request: NextRequest) {
 
     if (!updatedUser) {
       return NextResponse.json(
-        { error: 'Usuário não encontrado' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
@@ -53,11 +53,11 @@ export async function PUT(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Erro ao atualizar rate:', error);
+    console.error('Error updating rate:', error);
     return NextResponse.json(
       { 
-        error: 'Erro interno do servidor',
-        details: 'Tente novamente mais tarde'
+        error: 'Internal server error',
+        details: 'Please try again later'
       },
       { status: 500 }
     );
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'ID do usuário é obrigatório' },
+        { error: 'User ID is required' },
         { status: 400 }
       );
     }
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Usuário não encontrado' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
@@ -101,11 +101,11 @@ export async function GET(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Erro ao buscar rate:', error);
+    console.error('Error fetching rate:', error);
     return NextResponse.json(
       { 
-        error: 'Erro interno do servidor',
-        details: 'Tente novamente mais tarde'
+        error: 'Internal server error',
+        details: 'Please try again later'
       },
       { status: 500 }
     );

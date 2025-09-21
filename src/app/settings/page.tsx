@@ -5,7 +5,8 @@ import {
   Shield,
   Palette,
   Globe,
-  BellRing
+  BellRing,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,92 +16,92 @@ export default function SettingsPage() {
   return (
     <AppLayout
       currentPage="settings"
-      pageTitle="Configurações"
-      pageSubtitle="Gerencie suas preferências e configurações"
+      pageTitle="Settings"
+      pageSubtitle="Manage your preferences and settings"
     >
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Configurações</h1>
-          <p className="text-gray-600">Personalize sua experiência e gerencie suas preferências</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Settings</h1>
+          <p className="text-gray-600">Customize your experience and manage your preferences</p>
         </div>
 
         {/* Settings Categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Perfil e Conta</CardTitle>
+              <CardTitle className="text-sm font-medium">Profile & Account</CardTitle>
               <Shield className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Em breve</div>
+              <div className="text-2xl font-bold">Coming Soon</div>
               <p className="text-xs text-muted-foreground">
-                Gerencie informações pessoais e da conta
+                Manage personal and account information
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Notificações</CardTitle>
+              <CardTitle className="text-sm font-medium">Notifications</CardTitle>
               <BellRing className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Em breve</div>
+              <div className="text-2xl font-bold">Coming Soon</div>
               <p className="text-xs text-muted-foreground">
-                Configure alertas e notificações
+                Configure alerts and notifications
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Aparência</CardTitle>
+              <CardTitle className="text-sm font-medium">Appearance</CardTitle>
               <Palette className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Em breve</div>
+              <div className="text-2xl font-bold">Coming Soon</div>
               <p className="text-xs text-muted-foreground">
-                Tema, cores e personalização visual
+                Theme, colors and visual customization
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Privacidade</CardTitle>
-              <Shield className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Privacy</CardTitle>
+              <Lock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Em breve</div>
+              <div className="text-2xl font-bold">Coming Soon</div>
               <p className="text-xs text-muted-foreground">
-                Configurações de segurança e privacidade
+                Data control and privacy
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Idioma e Região</CardTitle>
+              <CardTitle className="text-sm font-medium">Language & Region</CardTitle>
               <Globe className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Em breve</div>
+              <div className="text-2xl font-bold">Coming Soon</div>
               <p className="text-xs text-muted-foreground">
-                Idioma, fuso horário e localização
+                Localization settings
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Integrações</CardTitle>
+              <CardTitle className="text-sm font-medium">Integrations</CardTitle>
               <Shield className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Em breve</div>
+              <div className="text-2xl font-bold">Coming Soon</div>
               <p className="text-xs text-muted-foreground">
-                Conecte com outras ferramentas
+                Connect with other tools
               </p>
             </CardContent>
           </Card>
@@ -110,16 +111,16 @@ export default function SettingsPage() {
         <div className="mt-8">
           <Card>
             <CardHeader>
-              <CardTitle>Área de Configurações</CardTitle>
+              <CardTitle>Settings Area</CardTitle>
               <CardDescription>
-                Esta página será desenvolvida para permitir a personalização completa da aplicação.
+                This page will be developed to allow complete application customization.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
                 <div className="text-center">
                   <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Conteúdo em desenvolvimento</p>
+                  <p className="text-gray-500">Content under development</p>
                 </div>
               </div>
             </CardContent>

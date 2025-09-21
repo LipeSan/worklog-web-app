@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -26,7 +26,7 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Validação de força da senha
+  // Password strength validation
   const passwordValidation = {
     minLength: newPassword.length >= 8,
     hasLowercase: /[a-z]/.test(newPassword),
@@ -37,11 +37,11 @@ export default function ResetPasswordPage() {
   const isPasswordValid = Object.values(passwordValidation).every(Boolean);
   const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0;
 
-  // Verificar validade do token ao carregar a página
+  // Check token validity when loading the page
   useEffect(() => {
     const validateToken = async () => {
       if (!token) {
-        setError("Token não fornecido");
+        setError("Token not provided");
         setIsValidating(false);
         return;
       }
@@ -54,11 +54,11 @@ export default function ResetPasswordPage() {
           setTokenValid(true);
           setUserEmail(data.email);
         } else {
-          setError(data.message || "Token inválido ou expirado");
+          setError(data.message || "Invalid or expired token");
         }
       } catch (error) {
-        console.error('Erro ao validar token:', error);
-        setError("Erro ao validar token");
+        console.error('Error validating token:', error);
+        setError("Error validating token");
       } finally {
         setIsValidating(false);
       }
@@ -71,12 +71,12 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     
     if (!isPasswordValid) {
-      setError("A senha não atende aos critérios de segurança");
+      setError("Password does not meet security criteria");
       return;
     }
 
     if (!passwordsMatch) {
-      setError("As senhas não coincidem");
+      setError("Passwords do not match");
       return;
     }
 
@@ -100,26 +100,26 @@ export default function ResetPasswordPage() {
 
       if (response.ok) {
         setIsSuccess(true);
-        toast.success('Senha redefinida com sucesso!');
+        toast.success('Password reset successfully!');
         
-        // Redirecionar para login após 3 segundos
+        // Redirect to login after 3 seconds
         setTimeout(() => {
           router.push('/login');
         }, 3000);
       } else {
-        setError(data.details || data.error || 'Erro ao redefinir senha');
-        toast.error(data.details || data.error || 'Erro ao redefinir senha');
+        setError(data.details || data.error || 'Error resetting password');
+        toast.error(data.details || data.error || 'Error resetting password');
       }
     } catch (error) {
-      console.error('Erro ao redefinir senha:', error);
-      setError('Erro de conexão. Tente novamente.');
-      toast.error('Erro de conexão. Tente novamente.');
+      console.error('Error resetting password:', error);
+      setError('Connection error. Please try again.');
+      toast.error('Connection error. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Tela de loading durante validação do token
+  // Loading screen during token validation
   if (isValidating) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -131,7 +131,7 @@ export default function ResetPasswordPage() {
           <Card className="shadow-xl border-0">
             <CardContent className="p-8 text-center">
               <div className="w-8 h-8 mx-auto mb-4 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-              <p className="text-gray-600">Validando token...</p>
+              <p className="text-gray-600">Validating token...</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -139,7 +139,7 @@ export default function ResetPasswordPage() {
     );
   }
 
-  // Tela de erro se token inválido
+  // Error screen if token is invalid
   if (!tokenValid) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -159,7 +159,7 @@ export default function ResetPasswordPage() {
                 <AlertCircle className="w-6 h-6 text-white" />
               </motion.div>
               <CardTitle className="text-2xl font-bold text-gray-900">
-                Token Inválido
+                Invalid Token
               </CardTitle>
               <CardDescription className="text-gray-600">
                 {error}
@@ -170,7 +170,7 @@ export default function ResetPasswordPage() {
                 onClick={() => router.push('/forgot-password')}
                 className="w-full h-12 bg-indigo-600 hover:bg-indigo-700"
               >
-                Solicitar novo link
+                Request new link
               </Button>
               <Button
                 onClick={() => router.push('/login')}
@@ -178,7 +178,7 @@ export default function ResetPasswordPage() {
                 className="w-full h-12"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar ao login
+                Back to login
               </Button>
             </CardContent>
           </Card>
@@ -187,7 +187,7 @@ export default function ResetPasswordPage() {
     );
   }
 
-  // Tela de sucesso
+  // Success screen
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -207,21 +207,21 @@ export default function ResetPasswordPage() {
                 <CheckCircle className="w-6 h-6 text-white" />
               </motion.div>
               <CardTitle className="text-2xl font-bold text-gray-900">
-                Senha Redefinida!
+                Password Reset!
               </CardTitle>
               <CardDescription className="text-gray-600">
-                Sua senha foi alterada com sucesso
+                Your password has been successfully changed
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 text-center">
               <p className="text-sm text-gray-600">
-                Você será redirecionado para a página de login em alguns segundos...
+                You will be redirected to the login page in a few seconds...
               </p>
               <Button
                 onClick={() => router.push('/login')}
                 className="w-full h-12 bg-indigo-600 hover:bg-indigo-700"
               >
-                Ir para login
+                Go to login
               </Button>
             </CardContent>
           </Card>
@@ -230,7 +230,7 @@ export default function ResetPasswordPage() {
     );
   }
 
-  // Formulário de redefinição de senha
+  // Password reset form
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <motion.div
@@ -250,10 +250,10 @@ export default function ResetPasswordPage() {
               <Lock className="w-6 h-6 text-white" />
             </motion.div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              Redefinir Senha
+              Reset Password
             </CardTitle>
             <CardDescription className="text-gray-600">
-              Defina uma nova senha para {userEmail}
+              Set a new password for {userEmail}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -266,14 +266,14 @@ export default function ResetPasswordPage() {
                 className="space-y-2"
               >
                 <Label htmlFor="newPassword" className="text-sm font-medium text-gray-700">
-                  Nova senha
+                  New password
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="newPassword"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Digite sua nova senha"
+                    placeholder="Enter your new password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="pl-10 pr-10 h-12 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
@@ -297,14 +297,14 @@ export default function ResetPasswordPage() {
                 className="space-y-2"
               >
                 <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                  Confirmar nova senha
+                  Confirm new password
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirme sua nova senha"
+                    placeholder="Confirm your new password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="pl-10 pr-10 h-12 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
@@ -327,22 +327,22 @@ export default function ResetPasswordPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="text-xs space-y-1 bg-gray-50 p-3 rounded-lg"
                 >
-                  <p className="font-medium text-gray-700 mb-2">Critérios da senha:</p>
+                  <p className="font-medium text-gray-700 mb-2">Password criteria:</p>
                   <div className={`flex items-center ${passwordValidation.minLength ? 'text-green-600' : 'text-gray-500'}`}>
                     <CheckCircle className="w-3 h-3 mr-2" />
-                    Pelo menos 8 caracteres
+                    At least 8 characters
                   </div>
                   <div className={`flex items-center ${passwordValidation.hasLowercase ? 'text-green-600' : 'text-gray-500'}`}>
                     <CheckCircle className="w-3 h-3 mr-2" />
-                    Uma letra minúscula
+                    One lowercase letter
                   </div>
                   <div className={`flex items-center ${passwordValidation.hasUppercase ? 'text-green-600' : 'text-gray-500'}`}>
                     <CheckCircle className="w-3 h-3 mr-2" />
-                    Uma letra maiúscula
+                    One uppercase letter
                   </div>
                   <div className={`flex items-center ${passwordValidation.hasNumber ? 'text-green-600' : 'text-gray-500'}`}>
                     <CheckCircle className="w-3 h-3 mr-2" />
-                    Um número
+                    One number
                   </div>
                 </motion.div>
               )}
@@ -357,7 +357,7 @@ export default function ResetPasswordPage() {
                   }`}
                 >
                   <CheckCircle className="w-3 h-3 mr-2" />
-                  {passwordsMatch ? 'Senhas coincidem' : 'Senhas não coincidem'}
+                  {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
                 </motion.div>
               )}
 
@@ -387,12 +387,12 @@ export default function ResetPasswordPage() {
                   {isLoading ? (
                     <>
                       <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Redefinindo...
+                      Resetting...
                     </>
                   ) : (
                     <>
                       <Lock className="w-4 h-4 mr-2" />
-                      Redefinir senha
+                      Reset password
                     </>
                   )}
                 </Button>
@@ -411,12 +411,28 @@ export default function ResetPasswordPage() {
                 className="text-indigo-600 hover:text-indigo-500 font-medium transition-colors inline-flex items-center"
               >
                 <ArrowLeft className="w-3 h-3 mr-1" />
-                Voltar ao login
+                Back to login
               </a>
             </motion.div>
           </CardContent>
         </Card>
       </motion.div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6">
+            <div className="text-center">Loading...</div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

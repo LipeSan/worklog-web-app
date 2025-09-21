@@ -13,7 +13,6 @@ import {
   AlertCircle,
   Edit,
   Trash2,
-  type LucideIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,65 +28,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import AddHoursModal from "@/components/AddHoursModal";
 import AppLayout from "@/components/AppLayout";
 import { useAuth } from "@/contexts/AuthContext";
-
-interface StatCard {
-  title: string;
-  value: string;
-  change: string;
-  trend: "up" | "down";
-  icon: LucideIcon;
-  color: string;
-  bgColor: string;
-}
-
-interface Activity {
-  id: number;
-  user: string;
-  action: string;
-  time: string;
-  avatar: string;
-}
-
-interface Project {
-  id: number;
-  name: string;
-  progress: number;
-  status: "active" | "completed" | "pending";
-  team: number;
-}
-
-interface PayrollPeriod {
-  id: string;
-  label: string;
-  startDate: Date;
-  endDate: Date;
-}
-
-interface HourEntry {
-  id: number;
-  date: string;
-  project: string;
-  startTime: string;
-  endTime: string;
-  hours: number;
-  rate: string;
-  total: string;
-  description?: string;
-}
-
-interface ApiResponse {
-  hours: HourEntry[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-  summary: {
-    totalHours: number;
-    totalAmount: number;
-  };
-}
+import { StatCard, Activity, Project, PayrollPeriod, HourEntry, ApiResponse } from "@/types";
 
 export default function DashboardPage() {
   const { isAuthenticated } = useAuth();
@@ -100,50 +41,50 @@ export default function DashboardPage() {
   const [previousSummary, setPreviousSummary] = useState({ totalHours: 0, totalAmount: 0 });
   const [editingEntry, setEditingEntry] = useState<HourEntry | null>(null);
 
-  // Função para gerar períodos de payroll quinzenais (a cada duas semanas)
+  // Function to generate fortnightly payroll periods (every two weeks)
   const generatePayrollPeriods = (): PayrollPeriod[] => {
     const periods: PayrollPeriod[] = [];
     const today = new Date();
     
-    // Encontrar uma data de referência (primeira segunda-feira de janeiro do ano atual)
+    // Find a reference date (first Monday of January of the current year)
     const currentYear = today.getFullYear();
-    const referenceDate = new Date(currentYear, 0, 1); // 1º de janeiro
+    const referenceDate = new Date(currentYear, 0, 1); // January 1st
     
-    // Ajustar para começar numa segunda-feira
+    // Adjust to start on a Monday
     const dayOfWeek = referenceDate.getDay();
     const daysToMonday = dayOfWeek === 0 ? 1 : 8 - dayOfWeek;
     referenceDate.setDate(referenceDate.getDate() + daysToMonday);
     
-    // Calcular quantos períodos atrás da data de referência precisamos para cobrir o ano todo
-    const startPeriod = -10; // 10 períodos antes
-    const endPeriod = 36; // 36 períodos depois (cobrindo mais de um ano)
+    // Calculate how many periods before the reference date we need to cover the whole year
+    const startPeriod = -10; // 10 periods before
+    const endPeriod = 36; // 36 periods after (covering more than a year)
     
     for (let periodNumber = startPeriod; periodNumber <= endPeriod; periodNumber++) {
       const startDate = new Date(referenceDate);
       startDate.setDate(referenceDate.getDate() + (periodNumber * 14));
       
       const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + 13); // 14 dias (2 semanas)
+      endDate.setDate(endDate.getDate() + 13); // 14 days (2 weeks)
       
       const formatDate = (date: Date) => {
-        return date.toLocaleDateString('pt-BR', { 
+        return date.toLocaleDateString('en-AU', { 
           day: '2-digit', 
           month: '2-digit',
           year: '2-digit'
         });
       };
       
-      const absolutePeriodNumber = periodNumber + 11; // Ajustar para números positivos
+      const absolutePeriodNumber = periodNumber + 11; // Adjust to positive numbers
       
       periods.push({
         id: `period-${absolutePeriodNumber}`,
-        label: `Período ${absolutePeriodNumber} (${formatDate(startDate)} - ${formatDate(endDate)})`,
+        label: `Period ${absolutePeriodNumber} (${formatDate(startDate)} - ${formatDate(endDate)})`,
         startDate: new Date(startDate),
         endDate: new Date(endDate)
       });
     }
     
-    // Filtrar apenas períodos relevantes (últimos 6 meses e próximos 6 meses)
+    // Filter only relevant periods (last 6 months and next 6 months)
     const sixMonthsAgo = new Date(today);
     sixMonthsAgo.setMonth(today.getMonth() - 6);
     
@@ -154,16 +95,16 @@ export default function DashboardPage() {
       return period.endDate >= sixMonthsAgo && period.startDate <= sixMonthsAhead;
     });
     
-    // Retornar os períodos em ordem reversa (mais recente primeiro)
+    // Return periods in reverse order (most recent first)
     return relevantPeriods.reverse();
   };
 
   const payrollPeriods = generatePayrollPeriods();
 
-  // Função para encontrar o período atual
+  // Function to find the current period
   const findCurrentPeriod = (periods: PayrollPeriod[]): string => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Zerar horas para comparação precisa
+    today.setHours(0, 0, 0, 0); // Reset hours for precise comparison
     
     for (const period of periods) {
       const startDate = new Date(period.startDate);
@@ -176,11 +117,11 @@ export default function DashboardPage() {
       }
     }
     
-    // Se não encontrar o período atual, retorna o mais recente
+    // If current period not found, return the most recent one
     return periods[0]?.id || '';
   };
 
-  // Definir período atual como padrão
+  // Set current period as default
   useEffect(() => {
     if (payrollPeriods.length > 0 && !selectedPayrollPeriod) {
       const currentPeriodId = findCurrentPeriod(payrollPeriods);
@@ -188,7 +129,7 @@ export default function DashboardPage() {
     }
   }, [payrollPeriods, selectedPayrollPeriod]);
 
-  // Função para buscar dados da API
+  // Function to fetch data from API
   const fetchHoursData = async (payrollPeriod: string) => {
     try {
       setLoading(true);
@@ -199,7 +140,7 @@ export default function DashboardPage() {
 
       const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error('Token de autenticação não encontrado');
+        throw new Error('Authentication token not found');
       }
 
       const params = new URLSearchParams({
@@ -217,28 +158,28 @@ export default function DashboardPage() {
       });
 
       if (!response.ok) {
-        throw new Error(`Erro ao buscar dados: ${response.status}`);
+        throw new Error(`Error fetching data: ${response.status}`);
       }
 
       const data: ApiResponse = await response.json();
       setHoursData(data.hours);
       setSummary(data.summary);
 
-      // Buscar dados do período anterior para comparação
+      // Fetch previous period data for comparison
       await fetchPreviousPeriodData(payrollPeriod);
     } catch (err) {
-      console.error('Erro ao buscar dados:', err);
-      setError(err instanceof Error ? err.message : 'Erro desconhecido');
+      console.error('Error fetching data:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
   };
 
-  // Função para buscar dados do período anterior
+  // Function to fetch previous period data
   const fetchPreviousPeriodData = async (currentPeriodId: string) => {
     try {
       const currentIndex = payrollPeriods.findIndex(p => p.id === currentPeriodId);
-      const previousPeriod = payrollPeriods[currentIndex + 1]; // Próximo na lista (anterior no tempo)
+      const previousPeriod = payrollPeriods[currentIndex + 1]; // Next in list (previous in time)
       
       if (!previousPeriod) {
         setPreviousSummary({ totalHours: 0, totalAmount: 0 });
@@ -251,7 +192,7 @@ export default function DashboardPage() {
       const params = new URLSearchParams({
         startDate: previousPeriod.startDate.toISOString().split('T')[0],
         endDate: previousPeriod.endDate.toISOString().split('T')[0],
-        limit: '1' // Só precisamos do summary
+        limit: '1' // We only need the summary
       });
 
       const response = await fetch(`/api/hours?${params}`, {
@@ -269,7 +210,7 @@ export default function DashboardPage() {
         setPreviousSummary({ totalHours: 0, totalAmount: 0 });
       }
     } catch (err) {
-      console.error('Erro ao buscar dados do período anterior:', err);
+      console.error('Error fetching previous period data:', err);
       setPreviousSummary({ totalHours: 0, totalAmount: 0 });
     }
   };
@@ -290,15 +231,15 @@ export default function DashboardPage() {
   // Função para formatar texto de mudança
   const formatChangeText = (percentage: number, trend: "up" | "down", hasPreviousData: boolean = true): string => {
     if (!hasPreviousData) {
-      return "Sem dados do período anterior";
+      return "No previous period data";
     }
     // Se a porcentagem já é negativa, não adiciona sinal extra
     // Se é positiva, adiciona o sinal +
     const sign = percentage >= 0 ? "+" : "";
-    return `${sign}${percentage}% vs período anterior`;
+    return `${sign}${percentage}% vs previous period`;
   };
 
-  // Buscar dados quando o período de payroll mudar
+  // Fetch data when payroll period changes
   useEffect(() => {
     if (selectedPayrollPeriod) {
       fetchHoursData(selectedPayrollPeriod);
@@ -310,7 +251,7 @@ export default function DashboardPage() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error('Token de autenticação não encontrado');
+        throw new Error('Authentication token not found');
       }
 
       const isEditing = editingEntry !== null;
@@ -328,13 +269,13 @@ export default function DashboardPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || `Erro ao ${isEditing ? 'editar' : 'adicionar'} horas`);
+        throw new Error(errorData.error || `Error ${isEditing ? 'editing' : 'adding'} hours`);
       }
 
-      // Sucesso - mostrar toast
-      console.log(`Horas ${isEditing ? 'editadas' : 'adicionadas'} com sucesso!`);
+      // Success - show toast
+      console.log(`Hours ${isEditing ? 'updated' : 'added'} successfully!`);
 
-      // Recarregar dados após adicionar/editar
+      // Reload data after adding/editing
       if (selectedPayrollPeriod) {
         await fetchHoursData(selectedPayrollPeriod);
       }
@@ -342,23 +283,23 @@ export default function DashboardPage() {
       setIsAddHoursModalOpen(false);
       setEditingEntry(null);
     } catch (error) {
-      console.error(`Erro ao ${editingEntry ? 'editar' : 'adicionar'} horas:`, error);
-      throw error; // Re-throw para que o modal possa lidar com o erro
+      console.error(`Error ${editingEntry ? 'editing' : 'adding'} hours:`, error);
+      throw error; // Re-throw so the modal can handle the error
     }
   };
 
-  // Handler para editar entrada
+  // Handler to edit entry
   const handleEditEntry = (entry: HourEntry) => {
     setEditingEntry(entry);
     setIsAddHoursModalOpen(true);
   };
 
-  // Handler para deletar entrada
+  // Handler to delete entry
   const handleDeleteEntry = async (id: number) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error('Token de autenticação não encontrado');
+        throw new Error('Authentication token not found');
       }
 
       const response = await fetch(`/api/hours/${id}`, {
@@ -370,29 +311,29 @@ export default function DashboardPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao deletar registro');
+        throw new Error(errorData.error || 'Error deleting record');
       }
 
-      console.log('Registro deletado com sucesso!');
+      console.log('Record deleted successfully!');
 
-      // Recarregar dados após deletar
+      // Reload data after deleting
       if (selectedPayrollPeriod) {
         await fetchHoursData(selectedPayrollPeriod);
       }
     } catch (error) {
-      console.error('Erro ao deletar registro:', error);
+      console.error('Error deleting record:', error);
       throw error;
     }
   };
 
-  // Calcular estatísticas baseadas nos dados reais
+  // Calculate statistics based on real data
   const hasPreviousData = previousSummary.totalHours > 0 || previousSummary.totalAmount > 0;
   const hoursChange = calculatePercentageChange(summary.totalHours, previousSummary.totalHours);
   const amountChange = calculatePercentageChange(summary.totalAmount, previousSummary.totalAmount);
 
   const stats: StatCard[] = [
     {
-      title: "Total de Horas",
+      title: "Total Hours",
       value: `${summary.totalHours}h`,
       change: formatChangeText(hoursChange.percentage, hoursChange.trend, hasPreviousData),
       trend: hoursChange.trend,
@@ -401,7 +342,7 @@ export default function DashboardPage() {
       bgColor: "bg-blue-50"
     },
     {
-      title: "Valor Total",
+      title: "Total Amount",
       value: `$ ${summary.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
       change: formatChangeText(amountChange.percentage, amountChange.trend, hasPreviousData),
       trend: amountChange.trend,
@@ -415,42 +356,42 @@ export default function DashboardPage() {
     {
       id: 1,
       type: "task_completed",
-      title: "Tarefa 'Implementar autenticação' concluída",
-      time: "2 horas atrás",
-      project: "App Mobile",
+      title: "Task 'Implement authentication' completed",
+      time: "2 hours ago",
+      project: "Mobile App",
       status: "completed"
     },
     {
       id: 2,
       type: "project_created",
-      title: "Novo projeto 'Website E-commerce' criado",
-      time: "4 horas atrás",
-      project: "Website E-commerce",
+      title: "New project 'E-commerce Website' created",
+      time: "4 hours ago",
+      project: "E-commerce Website",
       status: "new"
     },
     {
       id: 3,
       type: "deadline_approaching",
-      title: "Prazo do projeto se aproximando",
-      time: "6 horas atrás",
+      title: "Project deadline approaching",
+      time: "6 hours ago",
       project: "Dashboard Analytics",
       status: "warning"
     },
     {
       id: 4,
       type: "team_update",
-      title: "3 novos membros adicionados à equipe",
-      time: "1 dia atrás",
-      project: "Geral",
+      title: "3 new members added to team",
+      time: "1 day ago",
+      project: "General",
       status: "info"
     }
   ];
 
-  // Componente do seletor de período de payroll
+  // Payroll period selector component
   const PayrollSelector = () => (
     <div className="bg-white rounded-lg border shadow-sm p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-gray-900">Período de Payroll</h3>
+        <h3 className="text-sm font-medium text-gray-900">Payroll Period</h3>
         <CalendarDays className="w-4 h-4 text-gray-500" />
       </div>
       <Select
@@ -458,7 +399,7 @@ export default function DashboardPage() {
         onValueChange={setSelectedPayrollPeriod}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Selecione o período de payroll" />
+          <SelectValue placeholder="Select payroll period" />
         </SelectTrigger>
         <SelectContent>
           {payrollPeriods.map((period) => (
@@ -475,9 +416,9 @@ export default function DashboardPage() {
     <AppLayout
       currentPage="dashboard"
       pageTitle="Dashboard"
-      pageSubtitle="Bem-vindo de volta!"
+      pageSubtitle="Welcome back!"
     >
-      {/* Seletor de Período de Payroll */}
+      {/* Payroll Period Selector */}
       <div className="mb-6">
         <PayrollSelector />
       </div>
@@ -516,7 +457,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Lista de Horas */}
+      {/* Hours List */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -527,7 +468,7 @@ export default function DashboardPage() {
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center">
                 <Clock className="w-5 h-5 mr-2" />
-                Registro de Horas
+                Hours Log
               </div>
               <Button 
                 variant="outline" 
@@ -535,11 +476,11 @@ export default function DashboardPage() {
                 onClick={() => setIsAddHoursModalOpen(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Adicionar Horas
+                Add Hours
               </Button>
             </CardTitle>
             <CardDescription>
-              Histórico das suas horas trabalhadas no período selecionado
+              History of your worked hours in the selected period
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -553,23 +494,23 @@ export default function DashboardPage() {
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin mr-2" />
-                <span className="text-gray-600">Carregando dados...</span>
+                <span className="text-gray-600">Loading data...</span>
               </div>
             ) : hoursData.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <Clock className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>Nenhum registro de horas encontrado para este período.</p>
-                <p className="text-sm mt-2">Clique em &quot;Adicionar Horas&quot; para começar.</p>
+                <p>No hours records found for this period.</p>
+                <p className="text-sm mt-2">Click &quot;Add Hours&quot; to get started.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left py-3 px-4 font-medium text-gray-600">Data</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-600">Cliente</th>
-                      <th className="text-center py-3 px-4 font-medium text-gray-600">Horas</th>
-                      <th className="text-center py-3 px-4 font-medium text-gray-600">Taxa</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">Date</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">Client</th>
+                      <th className="text-center py-3 px-4 font-medium text-gray-600">Hours</th>
+                      <th className="text-center py-3 px-4 font-medium text-gray-600">Rate</th>
                       <th className="text-right py-3 px-4 font-medium text-gray-600">Total</th>
                     </tr>
                   </thead>
@@ -584,7 +525,7 @@ export default function DashboardPage() {
                         onClick={() => handleEditEntry(entry)}
                       >
                         <td className="py-3 px-4 text-sm text-gray-900">
-                          {new Date(entry.date).toLocaleDateString('pt-BR')}
+                          {new Date(entry.date).toLocaleDateString('en-AU')}
                         </td>
                         <td className="py-3 px-4">
                           <Badge variant="secondary" className="text-xs">
@@ -610,7 +551,7 @@ export default function DashboardPage() {
         </Card>
       </motion.div>
 
-      {/* Modal para adicionar horas */}
+      {/* Modal to add hours */}
       <AddHoursModal
         isOpen={isAddHoursModalOpen}
         onClose={() => {

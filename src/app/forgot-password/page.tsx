@@ -33,15 +33,15 @@ export default function ForgotPasswordPage() {
 
       if (response.ok) {
         setIsSubmitted(true);
-        toast.success('Email de recuperação enviado!');
+        toast.success('Recovery email sent!');
       } else {
-        setError(data.details || data.error || 'Erro ao enviar email de recuperação');
-        toast.error(data.details || data.error || 'Erro ao enviar email de recuperação');
+        setError(data.details || data.error || 'Error sending recovery email');
+        toast.error(data.details || data.error || 'Error sending recovery email');
       }
     } catch (error) {
-      console.error('Erro ao solicitar recuperação:', error);
-      setError('Erro de conexão. Tente novamente.');
-      toast.error('Erro de conexão. Tente novamente.');
+      console.error('Error requesting recovery:', error);
+      setError('Connection error. Please try again.');
+      toast.error('Connection error. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -67,10 +67,10 @@ export default function ForgotPasswordPage() {
                 <Send className="w-6 h-6 text-white" />
               </motion.div>
               <CardTitle className="text-2xl font-bold text-gray-900">
-                Email enviado!
+                Email sent!
               </CardTitle>
               <CardDescription className="text-gray-600">
-                Verifique sua caixa de entrada
+                Check your inbox
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -81,10 +81,10 @@ export default function ForgotPasswordPage() {
                 className="text-center text-sm text-gray-600 space-y-4"
               >
                 <p>
-                  Enviamos um link de recuperação de senha para <strong>{email}</strong>
+                  We&apos;ve sent a password recovery link to <strong>{email}</strong>
                 </p>
                 <p>
-                  Verifique sua caixa de entrada e spam. O link expira em 24 horas.
+                  Check your inbox and spam folder. The link expires in 24 hours.
                 </p>
               </motion.div>
 
@@ -99,7 +99,7 @@ export default function ForgotPasswordPage() {
                   variant="outline"
                   className="w-full h-12 border-gray-200 hover:bg-gray-50 transition-colors"
                 >
-                  Tentar outro email
+                  Try another email
                 </Button>
                 
                 <a
@@ -111,7 +111,7 @@ export default function ForgotPasswordPage() {
                     className="w-full h-12 text-indigo-600 hover:text-indigo-500 hover:bg-indigo-50 transition-colors inline-flex items-center justify-center"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar ao login
+                    Back to login
                   </Button>
                 </a>
               </motion.div>
@@ -141,10 +141,10 @@ export default function ForgotPasswordPage() {
               <KeyRound className="w-6 h-6 text-white" />
             </motion.div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              Recuperar senha
+              Recover password
             </CardTitle>
             <CardDescription className="text-gray-600">
-              Digite seu email para receber o link de recuperação
+              Enter your email to receive the recovery link
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -163,7 +163,7 @@ export default function ForgotPasswordPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="seu@email.com"
+                    placeholder="your@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10 h-12 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
@@ -190,7 +190,7 @@ export default function ForgotPasswordPage() {
                 className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg"
               >
                 <p>
-                  Enviaremos um link seguro para seu email que permitirá redefinir sua senha.
+                  We&apos;ll send a secure link to your email that will allow you to reset your password.
                 </p>
               </motion.div>
 
@@ -207,12 +207,12 @@ export default function ForgotPasswordPage() {
                   {isLoading ? (
                     <>
                       <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Enviando...
+                      Sending...
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4 mr-2" />
-                      Enviar link de recuperação
+                      Send recovery link
                     </>
                   )}
                 </Button>
@@ -225,13 +225,13 @@ export default function ForgotPasswordPage() {
               transition={{ delay: 0.6 }}
               className="text-center text-sm text-gray-600"
             >
-              Lembrou da senha?{" "}
+              Remember your password?{" "}
               <a
                 href="/login"
                 className="text-indigo-600 hover:text-indigo-500 font-medium transition-colors inline-flex items-center"
               >
                 <ArrowLeft className="w-3 h-3 mr-1" />
-                Voltar ao login
+                Back to login
               </a>
             </motion.div>
 
@@ -245,7 +245,7 @@ export default function ForgotPasswordPage() {
                 <span className="w-full border-t border-gray-200" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">Ou</span>
+                <span className="bg-white px-2 text-gray-500">Or</span>
               </div>
             </motion.div>
 
@@ -262,7 +262,7 @@ export default function ForgotPasswordPage() {
                   variant="outline"
                   className="w-full h-12 border-gray-200 hover:bg-gray-50 transition-colors"
                 >
-                  Criar nova conta
+                  Create new account
                 </Button>
               </a>
             </motion.div>

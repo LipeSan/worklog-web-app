@@ -34,7 +34,7 @@ export default function Sidebar({ isOpen, onClose, currentPage }: SidebarProps) 
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const { logout } = useAuth();
 
-  // Detectar se é tela grande
+  // Detect if it's a large screen
   React.useEffect(() => {
     const checkScreenSize = () => {
       setIsLargeScreen(window.innerWidth >= 1024);
@@ -54,24 +54,24 @@ export default function Sidebar({ isOpen, onClose, currentPage }: SidebarProps) 
       });
 
       if (response.ok) {
-        // Usar o logout do contexto
-        logout();
+        // Use context logout
+        await logout();
       } else {
-        console.error('Erro no logout');
+        console.error('Logout error');
         setIsLoggingOut(false);
       }
     } catch (error) {
-      console.error('Erro no logout:', error);
+      console.error('Logout error:', error);
       setIsLoggingOut(false);
     }
   };
 
   const menuItems: MenuItem[] = [
     { icon: Home, label: "Dashboard", active: currentPage === "dashboard", href: "/dashboard" },
-    { icon: BarChart3, label: "Relatórios", active: currentPage === "reports", href: "/reports" },
-    { icon: Settings, label: "Configurações", active: currentPage === "settings", href: "/settings" },
-    { icon: Clock, label: "Horas", active: currentPage === "hours", href: "/hours" },
-    { icon: User, label: "Meus Dados", active: currentPage === "profile", href: "/profile" }
+    { icon: BarChart3, label: "Reports", active: currentPage === "reports", href: "/reports" },
+    { icon: Settings, label: "Settings", active: currentPage === "settings", href: "/settings" },
+    { icon: Clock, label: "Hours", active: currentPage === "hours", href: "/hours" },
+    { icon: User, label: "My Profile", active: currentPage === "profile", href: "/profile" }
   ];
 
   return (
@@ -82,7 +82,7 @@ export default function Sidebar({ isOpen, onClose, currentPage }: SidebarProps) 
         animate={{ 
           x: isLargeScreen ? 0 : (isOpen ? 0 : -280),
         }}
-        className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg lg:relative"
+        className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg"
       >
         <div className="flex items-center justify-between h-16 px-6 border-b">
           <h1 className="text-xl font-bold text-gray-900">WorkLog</h1>
@@ -128,12 +128,12 @@ export default function Sidebar({ isOpen, onClose, currentPage }: SidebarProps) 
             ) : (
               <LogOut className="w-4 h-4 mr-3" />
             )}
-            {isLoggingOut ? 'Saindo...' : 'Sair'}
+            {isLoggingOut ? 'Signing out...' : 'Sign out'}
           </Button>
         </div>
       </motion.div>
 
-      {/* Overlay para mobile */}
+      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"

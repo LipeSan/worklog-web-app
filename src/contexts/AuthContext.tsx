@@ -14,7 +14,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (token: string, userData: User) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
 }
 
@@ -34,16 +34,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Função para verificar se o usuário está autenticado
   const checkAuth = async (): Promise<boolean> => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setIsLoading(false);
-        return false;
-      }
-
+      // Verificar via cookie (que é automaticamente enviado)
       const response = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include', // Incluir cookies na requisição
       });
 
       if (response.ok) {
@@ -52,15 +45,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsLoading(false);
         return true;
       } else {
-        // Token inválido, remover do localStorage
-        localStorage.removeItem('token');
+        // Token inválido ou não existe
         setUser(null);
         setIsLoading(false);
         return false;
       }
     } catch (error) {
       console.error('Erro ao verificar autenticação:', error);
-      localStorage.removeItem('token');
       setUser(null);
       setIsLoading(false);
       return false;
@@ -69,15 +60,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Função para fazer login
   const login = (token: string, userData: User) => {
-    localStorage.setItem('token', token);
+    // O token já está sendo definido como cookie pela API
+    // Apenas definir o usuário no estado
     setUser(userData);
   };
 
   // Função para fazer logout
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    router.push('/login');
+  const logout = async () => {
+    try {
+      // Fazer requisição para limpar o cookie no servidor
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    } finally {
+      setUser(null);
+      router.push('/login');
+    }
   };
 
   // Verificar autenticação ao carregar o componente

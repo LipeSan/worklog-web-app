@@ -5,8 +5,6 @@ import {
   Plus,
   Calendar,
   Timer,
-  PlayCircle,
-  PauseCircle,
   Clock,
   Edit,
   Trash2,
@@ -29,35 +27,7 @@ import AppLayout from "@/components/AppLayout";
 import AddHoursModal from "@/components/AddHoursModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-
-interface HoursData {
-  date: string;
-  project: string;
-  startTime: string;
-  endTime: string;
-  hours: number;
-  description?: string;
-}
-
-interface HourEntry extends HoursData {
-  id: number;
-  rate: string;
-  total: string;
-}
-
-interface HoursResponse {
-  hours: HourEntry[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-  summary: {
-    totalHours: number;
-    totalAmount: number;
-  };
-}
+import { HoursData, HourEntry, ApiResponse as HoursResponse } from "@/types";
 
 export default function HoursPage() {
   const { isAuthenticated } = useAuth();
@@ -70,7 +40,7 @@ export default function HoursPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<HourEntry | null>(null);
 
-  // Função para obter token
+  // Function to get token
   const getToken = () => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('token');
@@ -78,7 +48,7 @@ export default function HoursPage() {
     return null;
   };
 
-  // Buscar horas do usuário
+  // Fetch user hours
   const fetchHours = async () => {
     const token = getToken();
     if (!token || !isAuthenticated) return;
@@ -97,17 +67,17 @@ export default function HoursPage() {
         setHours(data.hours);
         setSummary(data.summary);
       } else {
-        toast.error('Erro ao carregar horas');
+        toast.error('Error loading hours');
       }
     } catch (error) {
-      console.error('Erro ao buscar horas:', error);
-      toast.error('Erro ao carregar horas');
+      console.error('Error fetching hours:', error);
+      toast.error('Error loading hours');
     } finally {
       setLoading(false);
     }
   };
 
-  // Adicionar nova entrada de horas
+  // Add new hours entry
   const handleAddHours = async (data: HoursData) => {
     const token = getToken();
     if (!token) return;
@@ -123,20 +93,20 @@ export default function HoursPage() {
       });
 
       if (response.ok) {
-        toast.success('Horas adicionadas com sucesso!');
+        toast.success('Hours added successfully!');
         setIsModalOpen(false);
-        fetchHours(); // Recarregar lista
+        fetchHours(); // Reload list
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Erro ao adicionar horas');
+        toast.error(error.error || 'Error adding hours');
       }
     } catch (error) {
-      console.error('Erro ao adicionar horas:', error);
-      toast.error('Erro ao adicionar horas');
+      console.error('Error adding hours:', error);
+      toast.error('Error adding hours');
     }
   };
 
-  // Editar entrada de horas
+  // Edit hours entry
   const handleEditHours = async (data: HoursData) => {
     const token = getToken();
     if (!token || !editingEntry) return;
@@ -152,21 +122,21 @@ export default function HoursPage() {
       });
 
       if (response.ok) {
-        toast.success('Horas atualizadas com sucesso!');
+        toast.success('Hours updated successfully!');
         setIsModalOpen(false);
         setEditingEntry(null);
-        fetchHours(); // Recarregar lista
+        fetchHours(); // Reload list
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Erro ao atualizar horas');
+        toast.error(error.error || 'Error updating hours');
       }
     } catch (error) {
-      console.error('Erro ao atualizar horas:', error);
-      toast.error('Erro ao atualizar horas');
+      console.error('Error updating hours:', error);
+      toast.error('Error updating hours');
     }
   };
 
-  // Excluir entrada de horas
+  // Delete hours entry
   const handleDeleteClick = (entry: HourEntry) => {
     setEntryToDelete(entry);
     setShowDeleteConfirm(true);
@@ -187,19 +157,19 @@ export default function HoursPage() {
       });
 
       if (response.ok) {
-        toast.success('Registro excluído com sucesso!');
+        toast.success('Record deleted successfully!');
         setShowDeleteConfirm(false);
         setEntryToDelete(null);
         setIsModalOpen(false);
         setEditingEntry(null);
-        fetchHours(); // Recarregar lista
+        fetchHours(); // Reload list
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Erro ao excluir registro');
+        toast.error(error.error || 'Error deleting record');
       }
     } catch (error) {
-      console.error('Erro ao excluir registro:', error);
-      toast.error('Erro ao excluir registro');
+      console.error('Error deleting record:', error);
+      toast.error('Error deleting record');
     }
   };
 
@@ -208,7 +178,7 @@ export default function HoursPage() {
     setEntryToDelete(null);
   };
 
-  // Filtrar horas por termo de busca
+  // Filter hours by search term
   const filteredHours = hours.filter(hour =>
     hour.project.toLowerCase().includes(searchTerm.toLowerCase()) ||
     hour.description?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -221,14 +191,14 @@ export default function HoursPage() {
   return (
     <AppLayout 
       currentPage="hours"
-      pageTitle="Horas"
-      pageSubtitle="Gerencie e acompanhe suas horas trabalhadas"
+      pageTitle="Hours"
+      pageSubtitle="Manage and track your worked hours"
     >
-      {/* Header com botão de adicionar */}
+      {/* Header with add button */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Horas</h1>
-          <p className="text-gray-600">Gerencie e acompanhe suas horas trabalhadas</p>
+          <h1 className="text-2xl font-bold text-gray-900">Hours</h1>
+          <p className="text-gray-600">Manage and track your worked hours</p>
         </div>
         <Button 
           className="bg-blue-600 hover:bg-blue-700"
@@ -238,45 +208,45 @@ export default function HoursPage() {
           }}
         >
           <Plus className="w-4 h-4 mr-2" />
-          Adicionar Horas
+          Add Hours
         </Button>
       </div>
 
-      {/* Cards de resumo */}
+      {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Horas</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Hours</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{summary.totalHours.toFixed(1)}h</div>
             <p className="text-xs text-muted-foreground">
-              Todas as horas registradas
+              All registered hours
             </p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
             <Timer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ {summary.totalAmount.toFixed(2)}</div>
+            <div className="text-2xl font-bold">$ {summary.totalAmount.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              Valor total das horas
+              Total value of hours
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Barra de busca */}
+      {/* Search bar */}
       <div className="mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
-            placeholder="Buscar por projeto ou descrição..."
+            placeholder="Search by project or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -284,26 +254,26 @@ export default function HoursPage() {
         </div>
       </div>
 
-      {/* Lista de horas */}
+      {/* Hours list */}
       <Card>
         <CardHeader>
-          <CardTitle>Registros de Horas</CardTitle>
+          <CardTitle>Hours Records</CardTitle>
           <CardDescription>
-            {filteredHours.length} registro(s) encontrado(s)
+            {filteredHours.length} record(s) found
           </CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-500">Carregando...</p>
+              <p className="mt-2 text-gray-500">Loading...</p>
             </div>
           ) : filteredHours.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Nenhum registro encontrado</p>
+              <p>No records found</p>
               <p className="text-sm">
-                {searchTerm ? 'Tente ajustar sua busca' : 'Adicione suas primeiras horas para começar'}
+                {searchTerm ? 'Try adjusting your search' : 'Add your first hours to get started'}
               </p>
             </div>
           ) : (
@@ -318,21 +288,21 @@ export default function HoursPage() {
                       <div className="flex items-center gap-2 mb-2">
                         <Badge variant="outline">{hour.project}</Badge>
                         <span className="text-sm text-gray-500">
-                          {new Date(hour.date).toLocaleDateString('pt-BR')}
+                          {new Date(hour.date).toLocaleDateString('en-AU')}
                         </span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
                         <div>
-                          <span className="font-medium">Início:</span> {hour.startTime}
+                          <span className="font-medium">Start:</span> {hour.startTime}
                         </div>
                         <div>
-                          <span className="font-medium">Fim:</span> {hour.endTime}
+                          <span className="font-medium">End:</span> {hour.endTime}
                         </div>
                         <div>
-                          <span className="font-medium">Horas:</span> {hour.hours}h
+                          <span className="font-medium">Hours:</span> {hour.hours}h
                         </div>
                         <div>
-                          <span className="font-medium">Total:</span> R$ {hour.total}
+                          <span className="font-medium">Total:</span> {hour.total}
                         </div>
                       </div>
                       {hour.description && (
@@ -367,7 +337,7 @@ export default function HoursPage() {
         </CardContent>
       </Card>
 
-      {/* Modal de adicionar/editar horas */}
+      {/* Add/edit hours modal */}
       <AddHoursModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -382,38 +352,38 @@ export default function HoursPage() {
         editingEntry={editingEntry}
       />
 
-      {/* Modal de confirmação de exclusão */}
+      {/* Delete confirmation modal */}
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir este registro de horas?
+              Are you sure you want to delete this hours record?
               {entryToDelete && (
                 <div className="mt-2 p-3 bg-gray-50 rounded-md">
-                  <p><strong>Projeto:</strong> {entryToDelete.project}</p>
-                  <p><strong>Data:</strong> {new Date(entryToDelete.date).toLocaleDateString('pt-BR')}</p>
-                  <p><strong>Horas:</strong> {entryToDelete.hours}h</p>
+                  <p><strong>Project:</strong> {entryToDelete.project}</p>
+                  <p><strong>Date:</strong> {new Date(entryToDelete.date).toLocaleDateString('en-AU')}</p>
+                  <p><strong>Hours:</strong> {entryToDelete.hours}h</p>
                   {entryToDelete.description && (
-                    <p><strong>Descrição:</strong> {entryToDelete.description}</p>
+                    <p><strong>Description:</strong> {entryToDelete.description}</p>
                   )}
                 </div>
               )}
               <p className="mt-2 text-sm text-red-600">
-                Esta ação não pode ser desfeita.
+                This action cannot be undone.
               </p>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={handleDeleteCancel}>
-              Cancelar
+              Cancel
             </Button>
             <Button 
               variant="destructive" 
               onClick={handleDeleteConfirm}
               className="bg-red-600 hover:bg-red-700"
             >
-              Excluir
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>

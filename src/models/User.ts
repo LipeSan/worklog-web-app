@@ -18,15 +18,15 @@ export interface CreateUserData {
   email: string;
   phone: string;
   password: string;
-  rate?: number; // Opcional, padrão será 25
+  rate?: number; // Optional, default will be 25
 }
 
 export class UserModel {
-  // Criar novo usuário
+  // Create new user
   static async create(userData: CreateUserData): Promise<User> {
     const { full_name, email, phone, password, rate = 25 } = userData;
     
-    // Hash da senha
+    // Hash the password
     const saltRounds = 12;
     const password_hash = await bcrypt.hash(password, saltRounds);
     
@@ -47,7 +47,7 @@ export class UserModel {
     }
   }
   
-  // Buscar usuário por email
+  // Find user by email
   static async findByEmail(email: string): Promise<User | null> {
     const queryText = `
       SELECT id, full_name, email, phone, password_hash, rate, created_at, updated_at, is_active
@@ -64,7 +64,7 @@ export class UserModel {
     }
   }
   
-  // Buscar usuário por ID
+  // Find user by ID
   static async findById(id: number): Promise<User | null> {
     const queryText = `
       SELECT id, full_name, email, phone, password_hash, rate, created_at, updated_at, is_active
@@ -81,7 +81,7 @@ export class UserModel {
     }
   }
   
-  // Verificar se email já existe
+  // Check if email already exists
   static async emailExists(email: string): Promise<boolean> {
     const queryText = `
       SELECT 1 FROM users WHERE email = $1 AND is_active = true
@@ -96,7 +96,7 @@ export class UserModel {
     }
   }
   
-  // Verificar senha
+  // Verify password
   static async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
     try {
       return await bcrypt.compare(plainPassword, hashedPassword);
@@ -106,7 +106,7 @@ export class UserModel {
     }
   }
 
-  // Atualizar rate do usuário
+  // Update user rate
   static async updateRate(userId: number, newRate: number): Promise<User | null> {
     const queryText = `
       UPDATE users 
@@ -124,7 +124,7 @@ export class UserModel {
     }
   }
 
-  // Atualizar perfil do usuário
+  // Update user profile
   static async updateProfile(userId: number, profileData: { full_name: string; phone: string; rate: string }): Promise<User | null> {
     const queryText = `
       UPDATE users 
@@ -142,9 +142,9 @@ export class UserModel {
     }
   }
 
-  // Atualizar senha do usuário
+  // Update user password
   static async updatePassword(userId: number, newPassword: string): Promise<User | null> {
-    // Hash da nova senha
+    // Hash the new password
     const saltRounds = 12;
     const password_hash = await bcrypt.hash(newPassword, saltRounds);
     

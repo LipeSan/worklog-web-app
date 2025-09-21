@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     // Criar resposta de sucesso
     const response = NextResponse.json(
       {
-        message: 'Logout realizado com sucesso'
+        message: 'Logout successful'
       },
       { status: 200 }
     );
@@ -22,12 +22,11 @@ export async function POST(request: NextRequest) {
     return response;
 
   } catch (error) {
-    console.error('Erro no logout:', error);
-    
+    console.error('Logout error:', error);
     return NextResponse.json(
       { 
-        error: 'Erro interno do servidor',
-        details: 'Tente novamente mais tarde'
+        error: 'Internal server error',
+        details: 'Error processing logout'
       },
       { status: 500 }
     );
@@ -36,12 +35,9 @@ export async function POST(request: NextRequest) {
 
 // Método GET para verificar se a API está funcionando
 export async function GET() {
-  return NextResponse.json(
-    { 
-      message: 'API de logout funcionando',
-      endpoint: '/api/auth/logout',
-      methods: ['POST']
-    },
-    { status: 200 }
-  );
+  return NextResponse.json({
+    message: 'Logout API working',
+    endpoint: '/api/auth/logout',
+    methods: ['POST']
+  }, { status: 200 });
 }

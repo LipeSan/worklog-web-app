@@ -59,22 +59,22 @@ async function sendResetEmail(email: string, resetToken: string): Promise<void> 
   // - Resend
   
   console.log(`
-    ===== EMAIL DE RECUPERAÇÃO DE SENHA =====
-    Para: ${email}
-    Assunto: Recuperação de senha - WorkLog
+    ===== PASSWORD RECOVERY EMAIL =====
+    To: ${email}
+    Subject: Password Recovery - WorkLog
     
-    Olá,
+    Hello,
     
-    Você solicitou a recuperação de sua senha. Clique no link abaixo para redefinir sua senha:
+    You requested password recovery. Click the link below to reset your password:
     
     ${resetUrl}
     
-    Este link expira em 24 horas.
+    This link expires in 24 hours.
     
-    Se você não solicitou esta recuperação, ignore este email.
+    If you did not request this recovery, please ignore this email.
     
-    Atenciosamente,
-    Equipe WorkLog
+    Best regards,
+    WorkLog Team
     ==========================================
   `);
 }
@@ -88,8 +88,8 @@ export async function POST(request: NextRequest) {
     if (!email) {
       return NextResponse.json(
         { 
-          error: 'Email é obrigatório',
-          details: 'Informe o email para recuperação'
+          error: 'Email is required',
+          details: 'Please provide email for recovery'
         },
         { status: 400 }
       );
@@ -99,8 +99,8 @@ export async function POST(request: NextRequest) {
     if (!isValidEmail(email)) {
       return NextResponse.json(
         { 
-          error: 'Email inválido',
-          details: 'Formato de email inválido'
+          error: 'Invalid email',
+          details: 'Invalid email format'
         },
         { status: 400 }
       );
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: true,
-          message: 'Se o email estiver cadastrado, você receberá as instruções de recuperação'
+          message: 'If the email is registered, you will receive recovery instructions'
         },
         { status: 200 }
       );
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: true,
-          message: 'Se o email estiver cadastrado, você receberá as instruções de recuperação'
+          message: 'If the email is registered, you will receive recovery instructions'
         },
         { status: 200 }
       );
@@ -145,18 +145,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         success: true,
-        message: 'Se o email estiver cadastrado, você receberá as instruções de recuperação'
+        message: 'If the email is registered, you will receive recovery instructions'
       },
       { status: 200 }
     );
 
   } catch (error) {
-    console.error('Erro ao processar solicitação de recuperação:', error);
+    console.error('Error processing recovery request:', error);
     
     return NextResponse.json(
       { 
-        error: 'Erro interno do servidor',
-        details: 'Tente novamente mais tarde'
+        error: 'Internal server error',
+        details: 'Please try again later'
       },
       { status: 500 }
     );
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json(
     { 
-      message: 'Endpoint de recuperação de senha ativo',
+      message: 'Password recovery endpoint active',
       timestamp: new Date().toISOString()
     },
     { status: 200 }

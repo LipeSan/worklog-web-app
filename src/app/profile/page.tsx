@@ -14,7 +14,7 @@ import PhoneInput from "@/components/ui/phone-input";
 import AppLayout from "@/components/AppLayout";
 import { toast } from "sonner";
 
-// Interface para os dados do usuário
+// Interface for user data
 interface UserData {
   id: number;
   full_name: string;
@@ -32,7 +32,7 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   
-  // Estados para os dados do usuário
+  // States for user data
   const [userData, setUserData] = useState<UserData | null>(null);
   const [formData, setFormData] = useState({
     full_name: "",
@@ -41,7 +41,7 @@ export default function ProfilePage() {
     rate: 25.00
   });
 
-  // Função para buscar dados do usuário
+  // Function to fetch user data
   const fetchUserData = async () => {
     try {
       setIsLoading(true);
@@ -49,13 +49,13 @@ export default function ProfilePage() {
 
       const response = await fetch('/api/user/profile', {
         method: 'GET',
-        credentials: 'include', // Para incluir cookies
+        credentials: 'include', // To include cookies
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Erro ao carregar dados do usuário');
+        throw new Error(data.error || 'Error loading user data');
       }
 
       setUserData(data.user);
@@ -67,14 +67,14 @@ export default function ProfilePage() {
       });
 
     } catch (error) {
-      console.error('Erro ao buscar dados do usuário:', error);
-      setError(error instanceof Error ? error.message : 'Erro inesperado');
+      console.error('Error fetching user data:', error);
+      setError(error instanceof Error ? error.message : 'Unexpected error');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Função para salvar dados do usuário
+  // Function to save user data
   const saveUserData = async () => {
     try {
       setIsSaving(true);
@@ -94,10 +94,10 @@ export default function ProfilePage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Erro ao salvar dados');
+        throw new Error(data.error || 'Error saving data');
       }
 
-      // Atualizar dados locais
+      // Update local data
       setUserData(data.user);
       setFormData({
         full_name: data.user.full_name,
@@ -107,17 +107,17 @@ export default function ProfilePage() {
       });
 
       setIsEditing(false);
-      toast.success('Dados atualizados com sucesso!');
+      toast.success('Data updated successfully!');
 
     } catch (error) {
-      console.error('Erro ao salvar dados do usuário:', error);
-      toast.error(error instanceof Error ? error.message : 'Erro inesperado ao salvar');
+      console.error('Error saving user data:', error);
+      toast.error(error instanceof Error ? error.message : 'Unexpected error while saving');
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Função para lidar com o clique do botão
+  // Function to handle button click
   const handleButtonClick = () => {
     if (isEditing) {
       saveUserData();
@@ -126,47 +126,47 @@ export default function ProfilePage() {
     }
   };
 
-  // Carregar dados do usuário na inicialização
+  // Load user data on initialization
   useEffect(() => {
     fetchUserData();
   }, []);
 
-  // Se estiver carregando, mostrar loading
+  // If loading, show loading
   if (isLoading) {
     return (
       <AppLayout 
         currentPage="profile"
-        pageTitle="Meus Dados"
-        pageSubtitle="Gerencie suas informações pessoais"
+        pageTitle="My Data"
+        pageSubtitle="Manage your personal information"
       >
         <div className="max-w-4xl mx-auto flex items-center justify-center min-h-[400px]">
           <div className="flex items-center space-x-2">
             <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
-            <span className="text-gray-600">Carregando dados do perfil...</span>
+            <span className="text-gray-600">Loading profile data...</span>
           </div>
         </div>
       </AppLayout>
     );
   }
 
-  // Se houver erro, mostrar mensagem de erro
+  // If there's an error, show error message
   if (error) {
     return (
       <AppLayout 
         currentPage="profile"
-        pageTitle="Meus Dados"
-        pageSubtitle="Gerencie suas informações pessoais"
+        pageTitle="My Data"
+        pageSubtitle="Manage your personal information"
       >
         <div className="max-w-4xl mx-auto">
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            <p className="font-medium">Erro ao carregar dados do perfil</p>
+            <p className="font-medium">Error loading profile data</p>
             <p className="text-sm mt-1">{error}</p>
             <Button 
               onClick={fetchUserData}
               variant="outline"
               className="mt-3"
             >
-              Tentar novamente
+              Try again
             </Button>
           </div>
         </div>
@@ -177,16 +177,16 @@ export default function ProfilePage() {
   return (
     <AppLayout 
       currentPage="profile"
-      pageTitle="Meus Dados"
-      pageSubtitle="Gerencie suas informações pessoais"
+      pageTitle="My Data"
+      pageSubtitle="Manage your personal information"
     >
       <div className="max-w-4xl mx-auto">
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Meu Perfil</h1>
-              <p className="text-gray-600">Gerencie suas informações pessoais e profissionais</p>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">My Profile</h1>
+              <p className="text-gray-600">Manage your personal and professional information</p>
             </div>
             <Button 
               onClick={handleButtonClick}
@@ -201,12 +201,12 @@ export default function ProfilePage() {
                   ) : (
                     <Save className="w-4 h-4" />
                   )}
-                  <span>{isSaving ? 'Salvando...' : 'Salvar'}</span>
+                  <span>{isSaving ? 'Saving...' : 'Save'}</span>
                 </>
               ) : (
                 <>
                   <Edit className="w-4 h-4" />
-                  <span>Editar</span>
+                  <span>Edit</span>
                 </>
               )}
             </Button>
@@ -216,16 +216,16 @@ export default function ProfilePage() {
         {/* Personal Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Informações Pessoais</CardTitle>
+            <CardTitle>Personal Information</CardTitle>
             <CardDescription>
-              Suas informações básicas de perfil
+              Your basic profile information
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nome Completo
+                  Full Name
                 </label>
                 <input
                   type="text"
@@ -262,20 +262,20 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telefone
+                  Phone
                 </label>
                 <PhoneInput
                   value={formData.phone}
                   onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
                   disabled={!isEditing}
-                  placeholder="Digite seu telefone"
+                  placeholder="Enter your phone number"
                   className="w-full"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Valor por Hora (AUD)
+                  Hourly Rate ($)
                 </label>
                 <div className="flex items-center space-x-2">
                   <DollarSign className="w-4 h-4 text-gray-400" />
@@ -294,7 +294,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  Seu valor por hora de trabalho em dólares australianos
+                  Your hourly work rate
                 </p>
               </div>
             </div>

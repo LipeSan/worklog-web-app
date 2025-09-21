@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select"
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'sonner'
+import { HoursData, HourEntry } from '@/types'
 
 interface AddHoursModalProps {
   isOpen: boolean
@@ -29,32 +30,12 @@ interface AddHoursModalProps {
   editingEntry?: HourEntry | null
 }
 
-interface HoursData {
-  date: string
-  project: string
-  startTime: string
-  endTime: string
-  hours: number
-}
-
-interface HourEntry {
-  id: number
-  date: string
-  project: string
-  startTime: string
-  endTime: string
-  hours: number
-  rate: string
-  total: string
-  description?: string
-}
-
 export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, editingEntry }: AddHoursModalProps) {
   const { isAuthenticated } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   
-  // Função para calcular horas trabalhadas
+  // Function to calculate worked hours
   const calculateHours = (startTime: string, endTime: string): number => {
     
     if (!startTime || !endTime) return 0
@@ -67,7 +48,7 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
     const diffMs = end.getTime() - start.getTime()
     const diffHours = diffMs / (1000 * 60 * 60)
 
-    return Math.round(diffHours * 100) / 100 // Arredonda para 2 casas decimais
+    return Math.round(diffHours * 100) / 100 // Round to 2 decimal places
   }
 
   const [formData, setFormData] = useState<HoursData>(() => {
@@ -82,7 +63,7 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
     }
   })
 
-  // Função para converter data sem problemas de fuso horário
+  // Function to convert date without timezone issues
   const formatDateForInput = (dateString: string) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -91,10 +72,10 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
     return `${year}-${month}-${day}`;
   };
 
-  // Função para normalizar formato de horas (remover segundos se existirem)
+  // Function to normalize time format (remove seconds if they exist)
   const normalizeTimeFormat = (timeString: string): string => {
     if (!timeString) return '';
-    // Se o formato for HH:MM:SS, converter para HH:MM
+    // If format is HH:MM:SS, convert to HH:MM
     if (timeString.includes(':') && timeString.split(':').length === 3) {
       const [hours, minutes] = timeString.split(':');
       return `${hours}:${minutes}`;
@@ -102,13 +83,13 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
     return timeString;
   };
 
-  // Atualizar formulário quando editingEntry mudar
+  // Update form when editingEntry changes
   useEffect(() => {
     if (editingEntry) {
-      // Converter a data para o formato YYYY-MM-DD sem problemas de fuso horário
+      // Convert date to YYYY-MM-DD format without timezone issues
       const formattedDate = formatDateForInput(editingEntry.date);
       
-      // Normalizar formato das horas (remover segundos se existirem)
+      // Normalize time format (remove seconds if they exist)
       const normalizedStartTime = normalizeTimeFormat(editingEntry.startTime);
       const normalizedEndTime = normalizeTimeFormat(editingEntry.endTime);
       
@@ -122,7 +103,7 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
         hours: calculatedHours
       });
     } else {
-      // Resetar para valores padrão quando não estiver editando
+      // Reset to default values when not editing
       const today = new Date();
       const todayFormatted = formatDateForInput(today.toISOString());
       const defaultStartTime = '18:00';
@@ -143,26 +124,26 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
     e.preventDefault()
     
     if (!isAuthenticated) {
-      toast.error('Você precisa estar logado para adicionar horas')
+      toast.error('You need to be logged in to add hours')
       return
     }
 
     if (!formData.project || !formData.startTime || !formData.endTime || formData.hours <= 0) {
-      toast.error('Preencha todos os campos obrigatórios')
+      toast.error('Please fill in all required fields')
       return
     }
 
     setIsLoading(true)
 
     try {
-      // Chamar callback do componente pai (que fará a requisição)
+      // Call parent component callback (which will make the request)
       await onSubmit(formData)
       
-      // Sucesso - mensagem diferente para edição e criação
+      // Success - different message for editing and creating
       const isEditing = editingEntry !== null;
-      toast.success(isEditing ? 'Horas editadas com sucesso!' : 'Horas adicionadas com sucesso!')
+      toast.success(isEditing ? 'Hours updated successfully!' : 'Hours added successfully!')
       
-      // Resetar formulário apenas se não estiver editando
+      // Reset form only if not editing
       if (!isEditing) {
         const today = new Date();
         const todayFormatted = formatDateForInput(today.toISOString());
@@ -179,8 +160,8 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
       onClose()
 
     } catch (error) {
-      console.error('Erro ao adicionar horas:', error)
-      toast.error(error instanceof Error ? error.message : 'Erro inesperado ao adicionar horas')
+      console.error('Error adding hours:', error)
+      toast.error(error instanceof Error ? error.message : 'Unexpected error adding hours')
     } finally {
       setIsLoading(false)
     }
@@ -195,7 +176,7 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
         [name]: name === 'hours' ? parseFloat(value) || 0 : value
       }
       
-      // Calcula automaticamente as horas quando startTime ou endTime mudam
+      // Automatically calculate hours when startTime or endTime changes
       if (name === 'startTime' || name === 'endTime') {
         const startTime = name === 'startTime' ? value : prev.startTime
         const endTime = name === 'endTime' ? value : prev.endTime
@@ -218,16 +199,16 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5 text-blue-600" />
-            {editingEntry ? 'Editar Horas' : 'Adicionar Horas'}
+            {editingEntry ? 'Edit Hours' : 'Add Hours'}
           </DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-          {/* Data */}
+          {/* Date */}
           <div className="space-y-2">
             <Label htmlFor="date" className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              Data
+              Date
             </Label>
             <Input
               type="date"
@@ -240,11 +221,11 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
             />
           </div>
 
-          {/* Cliente */}
+          {/* Client */}
           <div className="space-y-2 col-span-2">
             <Label className="flex items-center gap-1">
               <Briefcase className="h-4 w-4" />
-              Cliente
+              Client
             </Label>
             <Select 
               value={formData.project} 
@@ -253,21 +234,19 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
               required
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecione um cliente" />
+                <SelectValue placeholder="Select a client" />
               </SelectTrigger>
               <SelectContent className="w-full">
                 <SelectItem value="Bahbq">Bahbq</SelectItem>
-                <SelectItem value="Projeto A">Projeto A</SelectItem>
-                <SelectItem value="Projeto B">Projeto B</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Horário de Início */}
+          {/* Start Time */}
           <div className="space-y-2">
             <Label htmlFor="startTime" className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
-              Horário de Início
+              Start Time
             </Label>
             <Input
               id="startTime"
@@ -280,11 +259,11 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
             />
           </div>
 
-          {/* Horário de Fim */}
+          {/* End Time */}
           <div className="space-y-2">
             <Label htmlFor="endTime" className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
-              Horário de Fim
+              End Time
             </Label>
             <Input
               type="time"
@@ -297,12 +276,12 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
             />
           </div>
 
-          {/* Horas */}
+          {/* Hours */}
           <div className="space-y-2 col-span-2">
             <Label htmlFor="hours" className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
-              Horas Trabalhadas
-              <span className="text-xs text-muted-foreground ml-1">(calculado automaticamente)</span>
+              Hours Worked
+              <span className="text-xs text-muted-foreground ml-1">(calculated automatically)</span>
             </Label>
             <Input
               type="number"
@@ -329,7 +308,7 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
               disabled={isLoading}
               className="flex-1"
             >
-              Cancelar
+              Cancel
             </Button>
             {editingEntry && onDelete && (
               <Button
@@ -340,7 +319,7 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
                 className="flex-1"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Deletar
+                Delete
               </Button>
             )}
             <Button
@@ -351,36 +330,36 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {editingEntry ? 'Salvando...' : 'Adicionando...'}
+                  {editingEntry ? 'Saving...' : 'Adding...'}
                 </>
               ) : (
-                editingEntry ? 'Salvar' : 'Adicionar'
+                editingEntry ? 'Save' : 'Add'
               )}
             </Button>
           </div>
         </form>
       </DialogContent>
 
-      {/* Modal de confirmação de exclusão */}
+      {/* Delete confirmation modal */}
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogTitle>Confirm Deletion</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <p className="text-sm text-gray-600">
-              Tem certeza que deseja excluir este registro de horas? Esta ação não pode ser desfeita.
+              Are you sure you want to delete this hours record? This action cannot be undone.
             </p>
             {editingEntry && (
               <div className="mt-3 p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm">
-                  <strong>Data:</strong> {new Date(editingEntry.date).toLocaleDateString('pt-BR')}
+                  <strong>Date:</strong> {new Date(editingEntry.date).toLocaleDateString('en-AU')}
                 </p>
                 <p className="text-sm">
-                  <strong>Cliente:</strong> {editingEntry.project}
+                  <strong>Client:</strong> {editingEntry.project}
                 </p>
                 <p className="text-sm">
-                  <strong>Horas:</strong> {editingEntry.hours}h
+                  <strong>Hours:</strong> {editingEntry.hours}h
                 </p>
               </div>
             )}
@@ -392,7 +371,7 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
               onClick={() => setShowDeleteConfirm(false)}
               className="flex-1"
             >
-              Cancelar
+              Cancel
             </Button>
             <Button
               type="button"
@@ -406,7 +385,7 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
               className="flex-1"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Confirmar Exclusão
+              Confirm Deletion
             </Button>
           </div>
         </DialogContent>

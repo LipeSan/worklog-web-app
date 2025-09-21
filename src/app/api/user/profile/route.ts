@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     const token = extractToken(request);
     if (!token) {
       return NextResponse.json(
-        { error: 'Token de autenticação não encontrado' },
+        { error: 'Authentication token not found' },
         { status: 401 }
       );
     }
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Usuário não encontrado' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
@@ -121,9 +121,9 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erro ao buscar dados do usuário:', error);
+    console.error('Error fetching user data:', error);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -166,12 +166,12 @@ export async function PUT(request: NextRequest) {
     // Validar telefone
     if (!isValidAustralianPhone(phone)) {
       return NextResponse.json(
-        { 
-          error: 'Telefone inválido',
-          details: 'Use um formato válido para telefones australianos'
-        },
-        { status: 400 }
-      );
+          {
+            error: 'Invalid phone number',
+            details: 'Use a valid format for Australian phones'
+          },
+          { status: 400 }
+        );
     }
 
     // Validar formato da taxa
@@ -192,21 +192,21 @@ export async function PUT(request: NextRequest) {
 
     if (!updatedUser) {
       return NextResponse.json(
-        { error: 'Usuário não encontrado' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Dados atualizados com sucesso',
+      message: 'Data updated successfully',
       user: updatedUser
     });
 
   } catch (error) {
-    console.error('Erro ao atualizar dados do usuário:', error);
+    console.error('Error updating user data:', error);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
