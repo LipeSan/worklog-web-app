@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Clock, Calendar, Briefcase, Loader2, Trash2 } from 'lucide-react'
 import {
   Dialog,
@@ -34,6 +34,7 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
   const { isAuthenticated } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const dateInputRef = useRef<HTMLInputElement>(null)
   
   // Function to calculate worked hours
   const calculateHours = (startTime: string, endTime: string): number => {
@@ -119,6 +120,18 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
       })
     }
   }, [editingEntry])
+
+  // Remove focus from date input when modal opens
+  useEffect(() => {
+    if (isOpen && dateInputRef.current) {
+      // Small delay to ensure the modal is fully rendered
+      setTimeout(() => {
+        if (dateInputRef.current) {
+          dateInputRef.current.blur()
+        }
+      }, 100)
+    }
+  }, [isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -211,6 +224,7 @@ export default function AddHoursModal({ isOpen, onClose, onSubmit, onDelete, edi
               Date
             </Label>
             <Input
+              ref={dateInputRef}
               type="date"
               id="date"
               name="date"

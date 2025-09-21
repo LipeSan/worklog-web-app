@@ -68,8 +68,8 @@ export default function Sidebar({ isOpen, onClose, currentPage }: SidebarProps) 
 
   const menuItems: MenuItem[] = [
     { icon: Home, label: "Dashboard", active: currentPage === "dashboard", href: "/dashboard" },
-    { icon: BarChart3, label: "Reports", active: currentPage === "reports", href: "/reports" },
-    { icon: Settings, label: "Settings", active: currentPage === "settings", href: "/settings" },
+    //{ icon: BarChart3, label: "Reports", active: currentPage === "reports", href: "/reports" },
+    //{ icon: Settings, label: "Settings", active: currentPage === "settings", href: "/settings" },
     { icon: Clock, label: "Hours", active: currentPage === "hours", href: "/hours" },
     { icon: User, label: "My Profile", active: currentPage === "profile", href: "/profile" }
   ];
