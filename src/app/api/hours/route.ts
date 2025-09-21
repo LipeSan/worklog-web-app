@@ -168,7 +168,7 @@ export async function GET(request: NextRequest) {
     // Verificar autenticação
     const authHeader = request.headers.get('authorization');
     
-    if (!authHeader || !authHeader.startsWith('Bearer '))if (!token) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { error: 'Access token not provided' },
         { status: 401 }
