@@ -5,7 +5,24 @@ import { HoursData } from '@/types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
-// Função para validar os dados de entrada
+// Função para extrair token do cookie ou header
+function extractToken(request: NextRequest): string | null {
+  // Primeiro tenta pegar do cookie
+  const cookieToken = request.cookies.get('auth-token')?.value;
+  if (cookieToken) {
+    return cookieToken;
+  }
+
+  // Se não encontrar no cookie, tenta no header Authorization
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+
+  return null;
+}
+
+// Função para validar os dados de horasentrada
 function validateHoursData(data: HoursData): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 
@@ -64,16 +81,14 @@ function calculateHours(startTime: string, endTime: string): number {
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const authHeader = request.headers.get('authorization');
+    const token = extractToken(request);
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       return NextResponse.json(
-        { error: 'Access token not provided' },
+        { error: 'Authentication token not found' },
         { status: 401 }
       );
     }
-
-    const token = authHeader.substring(7);
 
     // Verify and decode token
     let decoded: { userId: number };
@@ -166,16 +181,14 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Verificar autenticação
-    const authHeader = request.headers.get('authorization');
+    const token = extractToken(request);
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       return NextResponse.json(
-        { error: 'Access token not provided' },
+        { error: 'Authentication token not found' },
         { status: 401 }
       );
     }
-
-    const token = authHeader.substring(7);
 
     // Verificar e decodificar o token
     let decoded: { userId: number };

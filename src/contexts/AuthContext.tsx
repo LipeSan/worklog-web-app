@@ -34,10 +34,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Função para verificar se o usuário está autenticado
   const checkAuth = async (): Promise<boolean> => {
     try {
-      // Verificar via cookie (que é automaticamente enviado)
-      const response = await fetch('/api/auth/me', {
+      // Primeiro, tentar via cookie (que é automaticamente enviado)
+      let response = await fetch('/api/auth/me', {
         credentials: 'include', // Incluir cookies na requisição
       });
+
+      // Se falhar com cookie, tentar com localStorage (fallback para Safari)
+      if (!response.ok) {
+        console.error('Cookie auth failed with status:', response.status);
+        const errorText = await response.text();
+        console.error('Cookie auth error:', errorText);
+        
+        const token = localStorage.getItem('auth-token');
+        if (token) {
+          console.log('Trying localStorage fallback with token:', token.substring(0, 20) + '...');
+          response = await fetch('/api/auth/me', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            credentials: 'include',
+          });
+          
+          if (!response.ok) {
+            const fallbackError = await response.text();
+            console.error('localStorage fallback also failed:', fallbackError);
+          } else {
+            console.log('localStorage fallback successful');
+          }
+        } else {
+          console.error('No token found in localStorage');
+        }
+      } else {
+        console.log('Cookie auth successful');
+      }
 
       if (response.ok) {
         const userData = await response.json();
@@ -48,6 +77,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Token inválido ou não existe
         setUser(null);
         setIsLoading(false);
+        // Limpar localStorage se o token for inválido
+        localStorage.removeItem('auth-token');
         return false;
       }
     } catch (error) {
@@ -61,7 +92,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Função para fazer login
   const login = (token: string, userData: User) => {
     // O token já está sendo definido como cookie pela API
-    // Apenas definir o usuário no estado
+    // Também salvar no localStorage como fallback para Safari
+    localStorage.setItem('auth-token', token);
+    // Definir o usuário no estado
     setUser(userData);
   };
 
@@ -76,6 +109,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     } finally {
+      // Limpar localStorage também
+      localStorage.removeItem('auth-token');
       setUser(null);
       router.push('/login');
     }

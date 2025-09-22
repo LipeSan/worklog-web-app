@@ -13,10 +13,11 @@ export async function POST() {
     // Remover o cookie de autenticação
     response.cookies.set('auth-token', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Forçar false em desenvolvimento para compatibilidade com Safari
       sameSite: 'lax',
       maxAge: 0, // Expira imediatamente
-      path: '/'
+      path: '/',
+      domain: undefined // Não definir domain para localhost
     });
 
     return response;

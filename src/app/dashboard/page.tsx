@@ -136,7 +136,7 @@ export default function DashboardPage() {
       const selectedPeriod = payrollPeriods.find(p => p.id === payrollPeriod);
       if (!selectedPeriod) return;
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth-token');
       if (!token) {
         throw new Error('Authentication token not found');
       }
@@ -184,7 +184,7 @@ export default function DashboardPage() {
         return;
       }
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth-token');
       if (!token) return;
 
       const params = new URLSearchParams({
@@ -247,7 +247,7 @@ export default function DashboardPage() {
   // Handler para adicionar/editar horas
   const handleAddHours = async (hoursData: { date: string; project: string; startTime: string; endTime: string; hours: number; description?: string }) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth-token');
       if (!token) {
         throw new Error('Authentication token not found');
       }
@@ -295,7 +295,7 @@ export default function DashboardPage() {
   // Handler to delete entry
   const handleDeleteEntry = async (id: number) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth-token');
       if (!token) {
         throw new Error('Authentication token not found');
       }

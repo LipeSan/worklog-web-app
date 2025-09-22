@@ -107,15 +107,16 @@ export async function POST(request: NextRequest) {
 
     // Definir cookie com o token (httpOnly para segurança)
     const cookieMaxAge = remember 
-      ? 30 * 24 * 60 * 60 * 1000 // 30 dias se lembrar
-      : 24 * 60 * 60 * 1000; // 24 horas se não lembrar
+      ? 30 * 24 * 60 * 60 // 30 dias se lembrar (em segundos)
+      : 24 * 60 * 60; // 24 horas se não lembrar (em segundos)
     
     response.cookies.set('auth-token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Forçar false em desenvolvimento para compatibilidade com Safari
       sameSite: 'lax',
       maxAge: cookieMaxAge,
-      path: '/'
+      path: '/',
+      domain: undefined // Não definir domain para localhost
     });
 
     return response;

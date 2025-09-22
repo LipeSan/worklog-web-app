@@ -5,6 +5,23 @@ import { HoursData } from '@/types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
+// Função para extrair token do cookie ou header
+function extractToken(request: NextRequest): string | null {
+  // Primeiro tenta pegar do cookie
+  const cookieToken = request.cookies.get('auth-token')?.value;
+  if (cookieToken) {
+    return cookieToken;
+  }
+
+  // Se não encontrar no cookie, tenta no header Authorization
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+
+  return null;
+}
+
 // Function to validate input data
 function validateHoursData(data: HoursData): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
@@ -65,16 +82,14 @@ export async function PUT(
 ) {
   try {
     // Check authentication
-    const authHeader = request.headers.get('authorization');
+    const token = extractToken(request);
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       return NextResponse.json(
-        { error: 'Access token not provided' },
+        { error: 'Authentication token not found' },
         { status: 401 }
       );
     }
-
-    const token = authHeader.substring(7);
 
     // Verify and decode token
     let decoded: { userId: number };
@@ -218,16 +233,14 @@ export async function DELETE(
 ) {
   try {
     // Check authentication
-    const authHeader = request.headers.get('authorization');
+    const token = extractToken(request);
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       return NextResponse.json(
-        { error: 'Access token not provided' },
+        { error: 'Authentication token not found' },
         { status: 401 }
       );
     }
-
-    const token = authHeader.substring(7);
 
     // Verify and decode token
     let decoded: { userId: number };

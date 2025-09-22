@@ -43,7 +43,7 @@ export default function HoursPage() {
   // Function to get token
   const getToken = () => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
+      return localStorage.getItem('auth-token');
     }
     return null;
   };

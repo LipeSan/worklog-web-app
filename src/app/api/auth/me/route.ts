@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     
     if (!token) {
       return NextResponse.json(
-        { error: 'Access token not provided' },
+        { error: 'Authentication token not found' },
         { status: 401 }
       );
     }
