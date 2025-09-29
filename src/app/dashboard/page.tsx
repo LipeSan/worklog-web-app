@@ -141,9 +141,14 @@ export default function DashboardPage() {
         throw new Error('Authentication token not found');
       }
 
+      const startDate = new Date(selectedPeriod.startDate);
+      startDate.setDate(startDate.getDate() + 1);
+      const endDate = new Date(selectedPeriod.endDate);
+      endDate.setDate(endDate.getDate() + 1);
+
       const params = new URLSearchParams({
-        startDate: selectedPeriod.startDate.toISOString().split('T')[0],
-        endDate: selectedPeriod.endDate.toISOString().split('T')[0],
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
         limit: '100'
       });
 
